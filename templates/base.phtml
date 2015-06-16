@@ -11,10 +11,11 @@
 <html lang="pl">
 <head>
     <meta charset="utf-8" />
-    <title>Tytuł</title>
-    <link href="<?php Loader::assetsPath(); ?>/css/style.css" rel="stylesheet" />
+    <title><?= $title ?></title>
+    <link href="/assets/css/style.css" rel="stylesheet" />
 </head>
 <body>
-    <h1><?php echo $params["title"]; ?></h1>
+
+    <h1><?= $title ?></h1>
 </body>
 </html>

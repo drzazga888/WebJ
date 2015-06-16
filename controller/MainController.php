@@ -9,9 +9,9 @@
 class MainController {
 
     function perform() {
-        Loader::importTemplate("base", array(
-            "title" => "działam"
-        ));
+        $view = new Template("base");
+        $view->setVar("title", "działam :)");
+        $view->render();
     }
 
 }

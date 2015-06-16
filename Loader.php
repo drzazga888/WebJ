@@ -13,14 +13,6 @@ class Loader {
         spl_autoload_register(array($this, "importModel"));
     }
 
-    public static function importTemplate($templateName, $params) {
-        include_once "templates/".$templateName.".phtml";
-    }
-
-    public static function assetsPath() {
-        echo "assets";
-    }
-
     private function importModel($className) {
         $this->import($className, "model", "php");
     }

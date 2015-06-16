@@ -8,6 +8,7 @@
 
 include_once "Router.php";
 include_once "Loader.php";
+include_once "Template.php";
 
 new Loader();
 
