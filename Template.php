@@ -24,4 +24,8 @@ class Template {
         $this->vars[$name] = $value;
     }
 
+    public function getVar($name) {
+        return $this->vars[$name];
+    }
+
 }

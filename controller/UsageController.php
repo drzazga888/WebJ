@@ -2,24 +2,24 @@
 /**
  * Created by PhpStorm.
  * User: kamil
- * Date: 09.06.15
- * Time: 13:35
+ * Date: 17.06.15
+ * Time: 00:56
  */
 
-class MainController {
+class UsageController {
 
     public function perform() {
 
         //creating and seting
         $baseTop = new Template("base_top");
-        $baseTop->setVar("title", "WebJ");
-        $baseTop->setVar("description", "Twórz muzykę gdzie tylko chcesz!");
-        $loremIpsum = new Template("lorem_ipsum");
+        $baseTop->setVar("description", "Jak używać");
+        $baseTop->setVar("title", $baseTop->getVar("description") . " - WebJ");
+        $usage = new Template("usage");
         $baseBottom = new Template("base_bottom");
 
         // rendering
         $baseTop->render();
-        $loremIpsum->render();
+        $usage->render();
         $baseBottom->render();
 
     }

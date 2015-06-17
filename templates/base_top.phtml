@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8" />
+    <title><?= $title ?></title>
+    <link href="/assets/css/style.css" rel="stylesheet" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="/assets/js/scripts.js"></script>
+</head>
+<body>
+
+    <header>
+        <h1>Web<em>J</em></h1>
+        <h2><?= $description ?></h2>
+    </header>
+
+    <nav>
+        <ul class="menu">
+            <li><a href="/">Strona główna</a></li>
+            <li><a href="/?controller=usage">Jak używać</a></li>
+            <li><a href="/?controller=docs">Dokumentacja</a></li>
+        </ul>
+        <ul class="pulled-right menu">
+            <li class="dropdown">
+                <?php if (true): ?>
+                    <a href="javascript:void(0);">Niezalogowany</a>
+                    <div class="dropdown-body">
+                        <p>Musisz się zalogować, by korzystać z aplikacji!</p>
+                        <p><a href="/?controller=auth&action=register">Rejestracja</a></p>
+                        <p><a href="#">Logowanie</a></p>
+                    </div>
+                <?php else: ?>
+                    <a href="javascript:void(0);">Witaj Zygfryd!</a>
+                    <div class="dropdown-body">
+                        <p>Zalogowano jako <em>Zygfryd Alojzy alolo@dzimejl.agieh</em></p>
+                        <p><a href="#">Wylogowanie</a></p>
+                    </div>
+                <?php endif; ?>
+            </li>
+        </ul>
+    </nav>
+
+    <main>
+        <?php if (isset($_SESSION["message"])): ?>
+            <p class="message
+            <?php
+                if (isset($_SESSION["message-class"]))
+                    echo $_SESSION["message-class"];
+            ?>
+            "><?= $_SESSION["message"] ?></p>
+        <?php endif; ?>
