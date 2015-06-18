@@ -22,7 +22,7 @@
         </ul>
         <ul class="pulled-right menu">
             <li class="dropdown">
-                <?php if (true): ?>
+                <?php if (!isset($_SESSION["logged"])): ?>
                     <a href="javascript:void(0);">Niezalogowany</a>
                     <div class="dropdown-body">
                         <p>Musisz się zalogować, by korzystać z aplikacji!</p>
@@ -30,10 +30,10 @@
                         <p><a href="/?controller=auth&action=login">Logowanie</a></p>
                     </div>
                 <?php else: ?>
-                    <a href="javascript:void(0);">Witaj Zygfryd!</a>
+                    <a href="javascript:void(0);">Zalogowany</a>
                     <div class="dropdown-body">
-                        <p>Zalogowano jako <em>Zygfryd Alojzy alolo@dzimejl.agieh</em></p>
-                        <p><a href="#">Wylogowanie</a></p>
+                        <p>Zalogowano jako <em><?= $_SESSION["logged"] ?></em></p>
+                        <p><a href="/?controller=auth&action=logout">Wylogowanie</a></p>
                     </div>
                 <?php endif; ?>
             </li>

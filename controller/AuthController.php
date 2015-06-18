@@ -40,6 +40,13 @@ class AuthController extends Controller {
 
     }
 
+    public function logout() {
+
+        unset($_SESSION["logged"]);
+        self::redirect("Wylogowano pomyślnie.", "");
+
+    }
+
     public function registerToDb() {
 
         $form = array(
@@ -81,6 +88,7 @@ class AuthController extends Controller {
         $isLoginDataCorrect = $model->isLoginDataCorrect($form);
         if (!$isLoginDataCorrect)
             self::redirect("Nie istnieje taki użytkownik.", "danger", "auth", "login");
+        $_SESSION["logged"] = $form["email"];
         self::redirect("Zostałeś zalogowany!", "success");
 
     }
