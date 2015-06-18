@@ -1,14 +1,13 @@
 <section>
-    <h3>Formularz rejestracji</h3>
-        <form method="post" action="/?controller=auth&action=register-to-db">
-            <fieldset>
-                <legend>Formularz rejestracji</legend>
-                <label>Nick: (od 4 do 12 znaków) <input type="text" name="nick" pattern=".{4,12}" required /></label>
-                <label>E-mail: <input type="email" name="email" required /></label>
-                <label>Powtórz e-mail: <input type="email" name="email2" required /></label>
-                <label>Hasło: (od 6 do 16 znaków) <input type="password" name="password" pattern=".{6,16}" required /></label>
-                <label>Powtórz hasło: <input type="password" name="password2" required /></label>
-                <button type="submit">Zarejestruj się</button>
-            </fieldset>
-        </form>
+    <h3>Zarejestruj się by móc korzystać z usługi</h3>
+    <form method="post" action="/?controller=auth&action=register-to-db">
+        <fieldset>
+            <legend>Formularz rejestracji</legend>
+            <label>E-mail: <input type="email" name="email" required /></label>
+            <label>Powtórz e-mail: <input type="email" name="email2" required /></label>
+            <label>Hasło: (od 6 do 16 znaków) <input type="password" name="password" pattern=".{6,16}" required /></label>
+            <label>Powtórz hasło: <input type="password" name="password2" required /></label>
+            <button type="submit">Zarejestruj się</button>
+        </fieldset>
+    </form>
 </section>

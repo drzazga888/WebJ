@@ -6,7 +6,7 @@
  * Time: 02:59
  */
 
-class Model {
+abstract class Model {
 
     private $pdo;
     private $db = "WebJ.db";
@@ -20,16 +20,20 @@ class Model {
     }
 
     protected function insert($table, $params) {
-        $query = 'insert into ' . $table . '(';
+        $queryNamePart = "";
+        $queryValuePart = "";
+        foreach ($params as $name => $value) {
+            $queryNamePart .= $name . ', ';
+            $queryValuePart .= ':' . $name . ', ';
+        }
+        $queryNamePart = substr($queryNamePart, 0, -2);
+        $queryValuePart = substr($queryValuePart, 0, -2);
+        $query = 'insert into ' . $table . ' (' . $queryNamePart . ') values (' . $queryValuePart . ')';
+        $stmt = $this->pdo->prepare($query);
         foreach ($params as $name => $value)
-            $query .= $name . ', ';
-        $query = substr($query, 0, -2);
-        $query .= ') values (';
-        foreach ($params as $value)
-            $query .= var_export($value, true) . ', ';
-        $query = substr($query, 0, -2);
-        $query .= ")";
-        $this->pdo->prepare($query)->execute();
+            $stmt->bindParam(':' . $name, $params[$name], PDO::PARAM_STR);
+        $stmt->execute();
+        $stmt->closeCursor();
     }
 
     protected function select($table, $names = array("*"), $where = null) {
@@ -38,9 +42,13 @@ class Model {
             $query .= $name . ', ';
         $query = substr($query, 0, -2);
         $query .= ' from ' . $table;
-        if (!$where)
+        if ($where)
             $query .= ' where ' . $where;
-        $this->pdo->prepare($query)->execute();
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute();
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
+        return $result;
     }
 
 }

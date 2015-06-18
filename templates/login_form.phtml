@@ -1,0 +1,11 @@
+<section>
+    <h3>Zaloguj się do aplikacji</h3>
+    <form method="post" action="/?controller=auth&action=login-to-db">
+        <fieldset>
+            <legend>Formularz logowania</legend>
+            <label>E-mail: <input type="email" name="email" required /></label>
+            <label>Hasło: (od 6 do 16 znaków) <input type="password" name="password" pattern=".{6,16}" required /></label>
+            <button type="submit">Zaloguj się</button>
+        </fieldset>
+    </form>
+</section>

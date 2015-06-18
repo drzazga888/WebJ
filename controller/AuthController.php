@@ -6,7 +6,7 @@
  * Time: 04:06
  */
 
-class AuthController {
+class AuthController extends Controller {
 
     public function register() {
 
@@ -24,10 +24,25 @@ class AuthController {
 
     }
 
+    public function login() {
+
+        //creating and seting
+        $baseTop = new Template("base_top");
+        $baseTop->setVar("description", "Logowanie");
+        $baseTop->setVar("title", $baseTop->getVar("description") . " - WebJ");
+        $login_form = new Template("login_form");
+        $baseBottom = new Template("base_bottom");
+
+        // rendering
+        $baseTop->render();
+        $login_form->render();
+        $baseBottom->render();
+
+    }
+
     public function registerToDb() {
 
         $form = array(
-            "nick" => $_POST["nick"],
             "email" => $_POST["email"],
             "email2" => $_POST["email2"],
             "password" => $_POST["password"],
@@ -37,32 +52,40 @@ class AuthController {
         try {
             $this->validate($form);
         } catch (Exception $e) {
-            $_SESSION["message"] = $e->getMessage();
-            $_SESSION["message-class"] = "danger";
-            header("Location: /?controller=auth&action=register");
-            die();
+            self::redirect($e->getMessage(), "danger", "auth", "register");
         }
 
-        unset($form["email2"]);
-        unset($form["password2"]);
-        $form["id"] = null;
-        $form["password"] = sha1($form["password"]);
         $model = new AuthModel();
+        $isLoginDataCorrect = $model->isRegistered($form["email"]);
+        if ($isLoginDataCorrect)
+            self::redirect("Użytkownik o podanym adresie e-mail już istnieje.", "danger", "auth", "register");
         $model->register($form);
-        header("Location: /");
+        self::redirect("Zostałeś zarejestrowany! Możesz się zalogować.", "success");
 
     }
 
-    // FIXME sprawdzanie, czy nick lub e-mail istnieje
-    private function validate($form) {
+    public function loginToDb() {
 
-        throw new Exception("Taki błąd z dupy :)");
+        $form = array(
+            "email" => $_POST["email"],
+            "password" => $_POST["password"]
+        );
 
-        // sprawdzanie długości loginu
-        if (isset($form["nick"])) {
-            if (strlen($form["nick"]) < 4 || strlen($form["nick"]) > 12)
-                throw new Exception("Długość nicku musi być z przedziału od 4 do 12 znaków.");
+        try {
+            $this->validate($form);
+        } catch (Exception $e) {
+            self::redirect($e->getMessage(), "danger", "auth", "login");
         }
+
+        $model = new AuthModel();
+        $isLoginDataCorrect = $model->isLoginDataCorrect($form);
+        if (!$isLoginDataCorrect)
+            self::redirect("Nie istnieje taki użytkownik.", "danger", "auth", "login");
+        self::redirect("Zostałeś zalogowany!", "success");
+
+    }
+
+    private function validate($form) {
 
         // sprawdzanie poprawności e-maila
         if (isset($form["email"])) {
