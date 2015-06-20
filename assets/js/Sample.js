@@ -1,41 +1,50 @@
-function Sample(start, length, audio) {
-    this.start = start;
-    this.length = length;
+function Sample(when, offset, duration, audio, pixelsPerSecond) {
     this.audio = audio;
-    this.id = Sample.sampleNumber++;
-    this.handler = $('<div draggable="true" class="sample"></div>').css( {
-        left: this.start + "px",
-        width: this.length + "px"
-    }).text(this.audio.name);
-    this.handler[0].addEventListener("dragstart", Sample.events.dragstart, true);
-    this.handler[0].addEventListener("dragend", Sample.events.dragend, true);
+    this.id = Sample.counter++;
+    this.pixelsPerSecond = pixelsPerSecond;
+    this.dom = $('<div data-id="' + this.id + '" draggable="true" class="sample">' + this.audio.name + '</div>');
+    this.setWhen(when);
+    this.setOffset(offset);
+    this.setDuration(duration);
+    this.dom[0].addEventListener("dragstart", Sample.events.dragstart, true);
+    this.dom[0].addEventListener("dragend", Sample.events.dragend, true);
+    Sample.collection[this.id] = this;
 }
 
-Sample.prototype.play = function() {
-    this.audio.play();
+Sample.prototype.play = function(cursorPos) {
+    this.audio.play(this.when - cursorPos, this.offset, this.duration);
 };
 
-Sample.prototype.move = function(newStart) {
-    this.start = newStart > 0 ? newStart : 0;
-    this.handler.css("left", this.start + "px");
+Sample.prototype.setWhen = function(when) {
+    this.when = when > 0 ? when : 0;
+    this.dom.css("left", (this.when * this.pixelsPerSecond) + "px");
+};
+
+Sample.prototype.setOffset = function(offset) {
+    this.offset = offset;
+};
+
+Sample.prototype.setDuration = function(duration) {
+    this.duration = duration;
+    this.dom.css("width", (this.duration * this.pixelsPerSecond) + "px");
+};
+
+Sample.getSample = function(dom) {
+    return Sample.collection[$(dom).closest(".sample").data("id")];
 };
 
 Sample.events = {
 
     dragstart: function(event) {
-        var droppedSample = Mixer.tracks[$(event.target).index()].get;
-        droppedSample.handler.remove();
-        Mixer.draggedSample = new Sample(0, Number(droppedAudio.buffer.duration) * 30, droppedAudio);
         event.dataTransfer.setData("text/plain", "");
         event.dataTransfer.effectAllowed = "move";
         event.dataTransfer.dropEffect = "move";
-        Track.timelinesWrapper.addClass("dragging");
     },
 
     dragend: function(event) {
-        Track.timelinesWrapper.removeClass("dragging");
     }
 
 };
 
-Sample.sampleNumber = 0;
+Sample.counter = 0;
+Sample.collection = [];

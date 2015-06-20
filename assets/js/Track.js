@@ -1,59 +1,49 @@
 function Track() {
     this.samples = [];
-    this.nr = ++Track.trackNumber;
-    this.headHandler = $('<div class="track-head">Track <em>' + this.nr + '</em></div>');
-    this.timelineHandler = $('<div class="timeline"></div>');
-    this.timelineHandler[0].addEventListener("dragenter", Track.events.dragenter, true);
-    this.timelineHandler[0].addEventListener("dragleave", Track.events.dragleave, true);
-    this.timelineHandler[0].addEventListener("dragover", Track.events.dragover, true);
-    this.timelineHandler[0].addEventListener("drop", Track.events.drop, true);
-    this.headHandler.appendTo(Track.headsWrapper);
-    this.timelineHandler.appendTo(Track.timelinesWrapper);
+    this.id = Track.counter++;
+    this.name = "Track #<em>" + this.id + "</em>";
+    this.headDom = $('<div data-id="' + this.id + '" class="track track-head">' + this.name + '</div>');
+    this.timelineDom = $('<div data-id="' + this.id + '" class="track timeline"></div>');
+    this.timelineDom[0].addEventListener("dragenter", Track.events.dragenter, true);
+    this.timelineDom[0].addEventListener("dragleave", Track.events.dragleave, true);
+    this.timelineDom[0].addEventListener("dragover", Track.events.dragover, true);
+    this.timelineDom[0].addEventListener("drop", Track.events.drop, true);
+    Track.collection[this.id] = this;
 }
 
 Track.prototype.addSample = function(sample) {
-    this.samples.push(sample);
-    this.timelineHandler.append(sample.handler);
+    this.samples[sample.id] = sample;
+    this.timelineDom.append(sample.dom);
 };
 
-Track.prototype.removeSample = function(sample) {
-    sample.handler.remove();
-    this.samples.splice(this.samples.indexOf(sample), 1);
-};
-
-Track.prototype.getSample = function(id) {
-    for (var i = 0; i < this.samples.length; ++i) {
-        if (this.samples[i].id === id)
-            return this.samples[i];
-    }
-    return null;
+Track.prototype.removeSample = function(id) {
+    this.samples[id].dom.remove();
+    this.samples[id] = null;
 };
 
 Track.events = {
 
     dragenter: function(event) {
         $(event.target).addClass("emphase");
-        Mixer.tracks[$(event.target).index()].addSample(Mixer.draggedSample);
     },
 
     dragover: function(event) {
         event.preventDefault();
-        Mixer.draggedSample.move(event.layerX - (Mixer.draggedSample.length * 0.5));
     },
 
     dragleave: function(event) {
         $(event.target).removeClass("emphase");
-        Mixer.tracks[$(event.target).index()].removeSample(Mixer.draggedSample);
     },
 
     drop: function(event) {
         $(event.target).removeClass("emphase");
-        Mixer.draggedSample = null;
     }
 
 };
 
-Track.trackNumber = 0;
-Track.wrapper = null;
-Track.headsWrapper = null;
-Track.timelinesWrapper = null;
+Track.getTrack = function(dom) {
+    return Track.collection[$(dom).closest(".track").data("id")];
+};
+
+Track.counter = 0;
+Track.collection = [];

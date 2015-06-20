@@ -1,16 +1,15 @@
 function Audio(name) {
     this.name = name;
+    this.id = Audio.counter++;
+    this.source = null;
+    this.buffer = null;
+    this.dom = $('<div data-id=' + this.id + ' class="audio button" draggable="true"><span class="icon-play">' + this.name + '</span></div>');
+    this.dom[0].addEventListener("click", Audio.events.click, true);
+    this.dom[0].addEventListener("dragstart", Audio.events.dragstart, true);
+    this.dom[0].addEventListener("dragend", Audio.events.dragend, true);
+    Audio.collection[this.id] = this;
     this.loadBuffer();
 }
-
-Audio.prototype.showButton = function(buffer) {
-    this.buffer = buffer;
-    this.handler = $('<div class="button" draggable="true">' + this.name + '</div>');
-    this.handler[0].addEventListener("click", Audio.events.click, true);
-    this.handler[0].addEventListener("dragstart", Audio.events.dragstart, true);
-    this.handler[0].addEventListener("dragend", Audio.events.dragend, true);
-    this.handler.appendTo(Audio.wrapper);
-};
 
 Audio.prototype.loadBuffer = function() {
     var request = new XMLHttpRequest();
@@ -19,7 +18,7 @@ Audio.prototype.loadBuffer = function() {
     request.responseType = 'arraybuffer';
     request.onload = function() {
         Audio.ctx.decodeAudioData(request.response, function(buffer) {
-            audio.showButton(buffer);
+            audio.buffer = buffer;
         });
     };
     request.send();
@@ -29,29 +28,68 @@ Audio.prototype.convertToUrl = function() {
     return "/userdata/share/" + this.name.replace(/ /g, '_').toLowerCase() + ".wav";
 };
 
+Audio.prototype.play = function(when, offset, duration) {
+    if (!this.buffer || this.source)
+        return;
+    if (duration === undefined)
+        duration = this.buffer.duration;
+    this.source = Audio.ctx.createBufferSource();
+    this.source.buffer = this.buffer;
+    this.source.loop = true;
+    this.source.connect(Audio.ctx.destination);
+    var audio = this;
+    this.waitingTimeoutID = window.setTimeout(function() {
+        audio.source.start(0, offset);
+        audio.playingTimeoutID = window.setTimeout(function() {
+            audio.pause();
+        }, duration * 1000);
+    }, when * 1000);
+
+};
+
+Audio.prototype.pause = function() {
+    if (!this.buffer || !this.source)
+        return;
+    this.source.stop();
+    window.clearTimeout(this.playingTimeoutID);
+    window.clearTimeout(this.waitingTimeoutID);
+    this.source = null;
+};
+
+Audio.getAudio = function(dom) {
+    return Audio.collection[$(dom).closest(".audio").data("id")];
+};
+
 Audio.events = {
 
     dragstart: function(event) {
-        var droppedAudio = Mixer.audios[event.target.innerHTML];
-        Mixer.draggedSample = new Sample(0, Number(droppedAudio.buffer.duration) * 30, droppedAudio);
         event.dataTransfer.setData("text/plain", "");
         event.dataTransfer.effectAllowed = "move";
         event.dataTransfer.dropEffect = "move";
-        Track.timelinesWrapper.addClass("dragging");
     },
 
     dragend: function(event) {
-        Track.timelinesWrapper.removeClass("dragging");
     },
 
     click: function(event) {
-        var source = Audio.ctx.createBufferSource();
-        source.buffer = Mixer.audios[event.target.innerHTML].buffer;
-        source.connect(Audio.ctx.destination);
-        source.start();
+        var audio = Audio.getAudio(event.target);
+        if (!audio.buffer)
+            return;
+        if (!audio.source) {
+            audio.dom.find(".icon-play").removeClass("icon-play").addClass("icon-pause");
+            audio.play();
+            audio.showingButtonTimeoutID = window.setTimeout(function() {
+                audio.dom.find(".icon-pause").removeClass("icon-pause").addClass("icon-play");
+            }, audio.buffer.duration * 1000);
+        } else {
+            audio.dom.find(".icon-pause").removeClass("icon-pause").addClass("icon-play");
+            audio.pause();
+            window.clearTimeout(audio.showingButtonTimeoutID);
+        }
     }
 
 };
 
+Audio.collection = [];
 Audio.ctx = new AudioContext();
-Audio.wrapper = null;
+Audio.counter = 0;
