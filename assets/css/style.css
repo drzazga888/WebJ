@@ -95,7 +95,8 @@ label input {
 }
 
 input,
-button {
+button,
+.button {
     background: #282828;
     border: solid 2px #72d3ff;
     border-radius: 5px;
@@ -106,13 +107,17 @@ input {
     padding: 5px;
 }
 
-button {
+button,
+.button {
     padding: 10px;
     font-size: 1.1em;
-    margin: 0 0 20px;
+    margin: 0 20px 20px;
+    display: inline-block;
+    cursor: pointer;
 }
 
-button:hover {
+button:hover,
+.button:hover {
     color: #72d3ff;
 }
 
@@ -149,7 +154,7 @@ button:hover {
     top: 100%;
     right: 0;
     background: #282828;
-    border-right: solid 3px #72D3FF;
+    border-bottom: solid 3px #72D3FF;
     margin-top: 2px;
 }
 
@@ -175,4 +180,78 @@ button:hover {
     background: #242;
     border-color: #0f0;
     color: #cfc;
+}
+
+.grid {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.grid-item {
+    display: table-cell;
+    vertical-align: top;
+    position: relative;
+}
+
+.scrollable {
+    width: 100%;
+    overflow-x: auto;
+    position: relative;
+}
+
+/* mixer */
+
+#tracks {
+    padding: 20px;
+}
+
+#tracks aside {
+    width: 160px;
+}
+
+#tracks .timelines {
+    width: 1300px;
+    background-image: repeating-linear-gradient(
+        to right,
+        transparent,
+        transparent 29px,
+        rgba(20%, 50%, 80%, 0.7) 30px
+    );
+}
+
+#tracks .timelines.dragging .sample {
+    pointer-events: none;
+}
+
+#tracks .track-head,
+#tracks .timeline {
+    margin: 20px 0;
+    height: 80px;
+}
+
+#tracks .timeline {
+    position: relative;
+    transition: background-color 0.2s;
+    background-color: rgba(40, 40, 40, 0.51);
+}
+
+#tracks .timeline.emphase {
+    background-color: #273848;
+}
+
+#tracks .sample {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    border: dashed 1px #C7E3E8;
+    overflow: hidden;
+    background: #38657d;
+    transition: box-shadow 0.2s;
+    font-size: 0.8em;
+    cursor: pointer;
+}
+
+#tracks .sample:hover {
+    box-shadow: #09f 0 0 10px;
 }

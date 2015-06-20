@@ -28,4 +28,8 @@ class Template {
         return $this->vars[$name];
     }
 
+    public function loadScript($name) {
+        $this->vars["scripts"][] = $name;
+    }
+
 }

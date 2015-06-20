@@ -5,5 +5,10 @@
         <p><small>Projekt nr <strong>2</strong> na Techniki Internetowe.</small></p>
     </footer>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <?php foreach ($scripts as $script): ?>
+        <script src="/assets/js/<?= $script ?>.js"></script>
+    <?php endforeach; ?>
+
 </body>
 </html>

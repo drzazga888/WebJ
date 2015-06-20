@@ -16,6 +16,8 @@ class AuthController extends Controller {
         $baseTop->setVar("title", $baseTop->getVar("description") . " - WebJ");
         $register_form = new Template("register_form");
         $baseBottom = new Template("base_bottom");
+        $baseBottom->loadScript("equalityChecker");
+        $baseBottom->loadScript("scripts");
 
         // rendering
         $baseTop->render();
@@ -32,6 +34,7 @@ class AuthController extends Controller {
         $baseTop->setVar("title", $baseTop->getVar("description") . " - WebJ");
         $login_form = new Template("login_form");
         $baseBottom = new Template("base_bottom");
+        $baseBottom->loadScript("scripts");
 
         // rendering
         $baseTop->render();

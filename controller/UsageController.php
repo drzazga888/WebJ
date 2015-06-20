@@ -16,6 +16,7 @@ class UsageController {
         $baseTop->setVar("title", $baseTop->getVar("description") . " - WebJ");
         $usage = new Template("usage");
         $baseBottom = new Template("base_bottom");
+        $baseBottom->loadScript("scripts");
 
         // rendering
         $baseTop->render();

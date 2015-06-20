@@ -16,6 +16,7 @@ class MainController {
         $baseTop->setVar("description", "Twórz muzykę gdzie tylko chcesz!");
         $loremIpsum = new Template("lorem_ipsum");
         $baseBottom = new Template("base_bottom");
+        $baseBottom->loadScript("scripts");
 
         // rendering
         $baseTop->render();

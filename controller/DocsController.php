@@ -16,6 +16,7 @@ class DocsController {
         $baseTop->setVar("title", $baseTop->getVar("description") . " - WebJ");
         $docs = new Template("docs");
         $baseBottom = new Template("base_bottom");
+        $baseBottom->loadScript("scripts");
 
         // rendering
         $baseTop->render();
