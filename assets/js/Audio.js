@@ -63,12 +63,19 @@ Audio.getAudio = function(dom) {
 Audio.events = {
 
     dragstart: function(event) {
+        var audio = Audio.getAudio(event.target);
+        if (!audio.buffer)
+            return false;
+        Mixer.draggedSample = new Sample(0, 0, audio.buffer.duration, audio, Mixer.pixelsPerSecond);
         event.dataTransfer.setData("text/plain", "");
         event.dataTransfer.effectAllowed = "move";
         event.dataTransfer.dropEffect = "move";
+        Mixer.trackTimelinesDom.addClass("dragging");
     },
 
     dragend: function(event) {
+        Mixer.trackTimelinesDom.removeClass("dragging");
+        Mixer.draggedSample = null;
     },
 
     click: function(event) {

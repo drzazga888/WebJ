@@ -43,13 +43,15 @@ a:hover {
 p,
 h1,
 h2,
-h3 {
+h3,
+h4{
     margin: 20px;
 }
 
 h1,
 h2,
-h3 {
+h3,
+h4 {
     font-weight: normal;
     color: #72d3ff;
 }
@@ -64,6 +66,11 @@ h2 {
 
 h3 {
     font-size: 1.2em;
+    text-transform: uppercase;
+}
+
+h4 {
+    font-size: 1em;
     text-transform: uppercase;
 }
 
@@ -123,19 +130,23 @@ button:hover,
 
 /* klasy */
 
-.pulled-right {
-    float: right;
+.stick-to-top-right-corner {
+    position: absolute;
+    top: 0;
+    right: 0;
 }
 
 .menu {
     margin: 0 15px;
     padding: 0;
     list-style: none;
-    display: inline-block;
+    display: block;
+    text-align: center;
 }
 
 .menu > li {
     display: inline-block;
+    text-align: left;
 }
 
 .menu > li > a {
@@ -233,11 +244,11 @@ button:hover,
 #tracks .timeline {
     position: relative;
     transition: background-color 0.2s;
-    background-color: rgba(40, 40, 40, 0.51);
+    background-color: rgba(40, 40, 40, 0.5);
 }
 
 #tracks .timeline.emphase {
-    background-color: #273848;
+    background-color: rgba(50, 60, 70, 0.5);
 }
 
 #tracks .sample {
@@ -254,4 +265,12 @@ button:hover,
 
 #tracks .sample:hover {
     box-shadow: #09f 0 0 10px;
+}
+
+#tracks .track-deleter {
+    cursor: pointer;
+}
+
+#tracks .track-deleter:hover {
+    color: #ff9381;
 }
