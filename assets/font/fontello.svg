@@ -1,0 +1,18 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg">
+<metadata>Copyright (C) 2015 by original authors @ fontello.com</metadata>
+<defs>
+<font id="fontello" horiz-adv-x="1000" >
+<font-face font-family="fontello" font-weight="400" font-stretch="normal" units-per-em="1000" ascent="850" descent="-150" />
+<missing-glyph horiz-adv-x="1000" />
+<glyph glyph-name="play" unicode="&#xe800;" d="m486 376q14-10 14-26 0-14-14-24l-428-266q-24-16-41-6t-17 40l0 514q0 30 17 40t41-6z" horiz-adv-x="500" />
+<glyph glyph-name="pause" unicode="&#xe801;" d="m440 700q90 0 90-64l0-570q0-66-90-66t-90 66l0 570q0 64 90 64z m-350 0q90 0 90-64l0-570q0-66-90-66t-90 66l0 570q0 64 90 64z" horiz-adv-x="530" />
+<glyph glyph-name="plus" unicode="&#xe802;" d="m786 439v-107q0-22-16-38t-38-15h-232v-233q0-22-16-37t-38-16h-107q-22 0-38 16t-15 37v233h-232q-23 0-38 15t-16 38v107q0 23 16 38t38 16h232v232q0 22 15 38t38 16h107q23 0 38-16t16-38v-232h232q22 0 38-16t16-38z" horiz-adv-x="785.7" />
+<glyph glyph-name="resize-horizontal" unicode="&#xe803;" d="m1000 350q0-14-11-25l-142-143q-11-11-26-11t-25 11-10 25v72h-572v-72q0-14-10-25t-25-11-25 11l-143 143q-11 11-11 25t11 25l143 143q10 11 25 11t25-11 10-25v-72h572v72q0 14 10 25t25 11 26-11l142-143q11-10 11-25z" horiz-adv-x="1000" />
+<glyph glyph-name="cancel" unicode="&#xe804;" d="m724 112q0-22-15-38l-76-76q-16-15-38-15t-38 15l-164 165-164-165q-16-15-38-15t-38 15l-76 76q-16 16-16 38t16 38l164 164-164 164q-16 16-16 38t16 38l76 76q16 16 38 16t38-16l164-164 164 164q16 16 38 16t38-16l76-76q15-15 15-38t-15-38l-164-164 164-164q15-15 15-38z" horiz-adv-x="785.7" />
+<glyph glyph-name="user" unicode="&#xe805;" d="m786 66q0-67-41-106t-108-39h-488q-67 0-108 39t-41 106q0 30 2 58t8 61 15 60 24 55 34 45 48 30 62 11q5 0 24-12t41-27 60-27 75-12 74 12 61 27 41 27 24 12q34 0 62-11t48-30 34-45 24-55 15-60 8-61 2-58z m-179 498q0-88-63-151t-151-63-152 63-62 151 62 152 152 63 151-63 63-152z" horiz-adv-x="785.7" />
+<glyph glyph-name="minus" unicode="&#xe806;" d="m786 439v-107q0-22-16-38t-38-15h-678q-23 0-38 15t-16 38v107q0 23 16 38t38 16h678q22 0 38-16t16-38z" horiz-adv-x="785.7" />
+</font>
+</defs>
+</svg>

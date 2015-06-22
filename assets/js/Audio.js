@@ -3,7 +3,7 @@ function Audio(name) {
     this.id = Audio.counter++;
     this.source = null;
     this.buffer = null;
-    this.dom = $('<div data-id=' + this.id + ' class="audio button" draggable="true"><span class="icon-play">' + this.name + '</span></div>');
+    this.dom = $('<div data-id="' + this.id + '" class="audio button icon-play" draggable="true">' + this.name + '</div>');
     this.dom[0].addEventListener("click", Audio.events.click, true);
     this.dom[0].addEventListener("dragstart", Audio.events.dragstart, true);
     this.dom[0].addEventListener("dragend", Audio.events.dragend, true);
@@ -28,31 +28,26 @@ Audio.prototype.convertToUrl = function() {
     return "/userdata/share/" + this.name.replace(/ /g, '_').toLowerCase() + ".wav";
 };
 
-Audio.prototype.play = function(when, offset, duration) {
+Audio.prototype.play = function() {
     if (!this.buffer || this.source)
         return;
-    if (duration === undefined)
-        duration = this.buffer.duration;
     this.source = Audio.ctx.createBufferSource();
     this.source.buffer = this.buffer;
-    this.source.loop = true;
     this.source.connect(Audio.ctx.destination);
-    var audio = this;
-    this.waitingTimeoutID = window.setTimeout(function() {
-        audio.source.start(0, offset);
-        audio.playingTimeoutID = window.setTimeout(function() {
-            audio.pause();
-        }, duration * 1000);
-    }, when * 1000);
-
+    var dom = this.dom;
+    dom.removeClass("icon-play").addClass("icon-pause");
+    this.timeoutId = window.setTimeout(function() {
+        dom.removeClass("icon-pause").addClass("icon-play");
+    }, this.buffer.duration * 1000);
+    this.source.start(0);
 };
 
 Audio.prototype.pause = function() {
     if (!this.buffer || !this.source)
         return;
+    this.dom.removeClass("icon-pause").addClass("icon-play");
+    window.clearInterval(this.timeoutId);
     this.source.stop();
-    window.clearTimeout(this.playingTimeoutID);
-    window.clearTimeout(this.waitingTimeoutID);
     this.source = null;
 };
 
@@ -80,19 +75,10 @@ Audio.events = {
 
     click: function(event) {
         var audio = Audio.getAudio(event.target);
-        if (!audio.buffer)
-            return;
-        if (!audio.source) {
-            audio.dom.find(".icon-play").removeClass("icon-play").addClass("icon-pause");
+        if (!audio.source)
             audio.play();
-            audio.showingButtonTimeoutID = window.setTimeout(function() {
-                audio.dom.find(".icon-pause").removeClass("icon-pause").addClass("icon-play");
-            }, audio.buffer.duration * 1000);
-        } else {
-            audio.dom.find(".icon-pause").removeClass("icon-pause").addClass("icon-play");
+        else
             audio.pause();
-            window.clearTimeout(audio.showingButtonTimeoutID);
-        }
     }
 
 };

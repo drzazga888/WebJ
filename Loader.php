@@ -14,11 +14,11 @@ class Loader {
     }
 
     private function importModel($className) {
-        $this->import($className, "model", "php");
+        return $this->import($className, "model", "php");
     }
 
     private function importController($className) {
-        $this->import($className, "controller", "php");
+        return $this->import($className, "controller", "php");
     }
 
     private function import($name, $type, $extension) {

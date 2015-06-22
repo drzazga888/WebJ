@@ -19,23 +19,17 @@ Track.prototype.addSample = function(sample) {
     this.timelineDom.append(sample.dom);
 };
 
-Track.prototype.removeSample = function(id) {
-    this.samples[id].dom.remove();
-    this.samples[id] = null;
-};
-
 Track.events = {
 
     dragenter: function(event) {
         $(event.target).addClass("emphase");
         var track = Track.getTrack(event.target);
-        Mixer.draggedSample.setWhen(event.layerX / Mixer.draggedSample.pixelsPerSecond);
         Mixer.draggedSample.dom.appendTo(track.timelineDom);
     },
 
     dragover: function(event) {
         event.preventDefault();
-        Mixer.draggedSample.setWhen(event.layerX / Mixer.draggedSample.pixelsPerSecond);
+        Mixer.draggedSample.setWhen((event.layerX / Mixer.draggedSample.pixelsPerSecond) - (Mixer.draggedSample.duration * 0.5));
     },
 
     dragleave: function(event) {

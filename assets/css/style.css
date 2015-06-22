@@ -207,7 +207,7 @@ button:hover,
 
 .scrollable {
     width: 100%;
-    overflow-x: auto;
+    overflow-x: scroll;
     position: relative;
 }
 
@@ -219,6 +219,7 @@ button:hover,
 
 #tracks aside {
     width: 160px;
+    padding-top: 20px;
 }
 
 #tracks .timelines {
@@ -235,10 +236,32 @@ button:hover,
     pointer-events: none;
 }
 
+#tracks .time {
+    height: 20px;
+    position: relative;
+    font-size: 0.8em;
+}
+
+#tracks .time-item {
+    position: absolute;
+    top: 0;
+}
+
+#tracks .pipe {
+    width: 1px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: #0ff;
+    box-shadow: #0099ff 0 0 3px;
+    left: 0;
+    display: none;
+}
+
 #tracks .track-head,
 #tracks .timeline {
     margin: 20px 0;
-    height: 80px;
+    height: 100px;
 }
 
 #tracks .timeline {
@@ -257,10 +280,24 @@ button:hover,
     height: 100%;
     border: dashed 1px #C7E3E8;
     overflow: hidden;
-    background: #38657d;
+    background: rgba(56, 101, 125, 0.7);
     transition: box-shadow 0.2s;
     font-size: 0.8em;
     cursor: pointer;
+}
+
+#tracks .sample p {
+    margin: 3px;
+    white-space: nowrap;
+}
+
+#tracks .sample input {
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: none;
+    color: #FFCE00;
+    width: 50px;
 }
 
 #tracks .sample:hover {

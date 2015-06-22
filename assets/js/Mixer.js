@@ -1,23 +1,7 @@
 $(document).ready(function() {
 
-    // dom init
-    var tracksDom = $("#tracks");
-    Mixer.trackHeadsDom = tracksDom.children("aside");
-    Mixer.trackTimelinesDom = tracksDom.find(".timelines");
-    Mixer.audiosDom = $("#audios");
-    Mixer.newTrackButton = $("#new-track");
-
-    // events
-    Mixer.newTrackButton.on("click", function() {
-        Mixer.addTrack(new Track());
-    });
-    Mixer.trackHeadsDom.on("click", ".track-deleter", function(event) {
-        Mixer.removeTrack($(this).closest(".track").data("id"));
-    });
-
     // sample data
-    Mixer.setPixelsPerSecond(30);
-    Mixer.setTimelineDuration(15);
+    Mixer(15, 80);
     var audio1 = new Audio("Beautiful Touch Pad Trap");
     var audio2 = new Audio("Bottem Shelf Drums");
     var audio3 = new Audio("Somedaydreams Chillout Guitars V2");
@@ -37,18 +21,50 @@ $(document).ready(function() {
 
 });
 
-function jebnij(komunikat) {
-    console.log("-<>--<>--<>--<>--<>-");
-    console.warn(komunikat);
-    console.log("Mixer.draggedSample", Mixer.draggedSample);
-    console.log("Sample.collection", Sample.collection);
-    console.log("track.samples");
-    for (var i = 0; i < Track.collection.length; ++i) {
-        console.log("i", i, "track.samples", Track.collection[i].samples);
-    }
-}
+function Mixer(timelineDuration, pixelsPerSecond) {
 
-var Mixer = {};
+    // dom init
+    var tracksDom = $("#tracks");
+    Mixer.trackHeadsDom = tracksDom.children("aside");
+    Mixer.trackTimelinesDom = tracksDom.find(".timelines");
+    Mixer.audiosDom = $("#audios");
+    Mixer.newTrackButton = $("#new-track");
+    Mixer.zoomIn = $("#zoom-in");
+    Mixer.zoomOut = $("#zoom-out");
+    Mixer.playPauseButton = $("#play");
+    Mixer.timeLabels = tracksDom.find(".time");
+    Mixer.pipe = tracksDom.find(".pipe");
+    Mixer.timelineDurationChanger = $("#timeline-duration");
+
+    // events
+    Mixer.newTrackButton.on("click", function() {
+        Mixer.addTrack(new Track());
+    });
+    Mixer.trackHeadsDom.on("click", ".track-deleter", function(event) {
+        Mixer.removeTrack($(this).closest(".track").data("id"));
+    });
+    Mixer.zoomIn.on("click", function(event) {
+        Mixer.setPixelsPerSecond(Mixer.pixelsPerSecond * 1.6);
+    });
+    Mixer.zoomOut.on("click", function(event) {
+        Mixer.setPixelsPerSecond(Mixer.pixelsPerSecond * 0.625);
+    });
+    Mixer.playPauseButton.on("click", function(event) {
+        if (!Mixer.isPlaying)
+            Mixer.play();
+        else
+            Mixer.pause();
+    });
+    Mixer.timelineDurationChanger.on("change", function(event) {
+        Mixer.setTimelineDuration(event.target.value);
+    });
+
+    // setting params
+    Mixer.setTimelineDuration(timelineDuration);
+    Mixer.setPixelsPerSecond(pixelsPerSecond);
+    Mixer.timelineDurationChanger.val(timelineDuration);
+
+}
 
 Mixer.addAudio = function(audio) {
     this.audios[audio.id] = audio;
@@ -72,6 +88,7 @@ Mixer.setTimelineDuration = function(duration) {
     Mixer.trackTimelinesDom.css( {
         width: duration * Mixer.pixelsPerSecond + "px"
     });
+    Mixer.actualizeTimes();
 };
 
 Mixer.setPixelsPerSecond = function(pixelsPerSecond) {
@@ -89,14 +106,55 @@ Mixer.setPixelsPerSecond = function(pixelsPerSecond) {
     });
     for (var i = 0; i < Sample.collection.length; ++i)
         Sample.collection[i].changeScale(pixelsPerSecond);
+    Mixer.actualizeTimes();
+};
+
+Mixer.play = function() {
+    Mixer.isPlaying = true;
+    for (var i = 0; i < Sample.collection.length; ++i) {
+        if (Sample.collection[i] !== undefined)
+            Sample.collection[i].play(0);
+    }
+    Mixer.pipe.css("left", 0);
+    Mixer.pipe.show();
+    Mixer.playPauseButton.removeClass("icon-play").addClass("icon-pause");
+    var t = 0;
+    Mixer.pipeInterval = window.setInterval(function() {
+        Mixer.pipe.css("left", (t * Mixer.pixelsPerSecond) + "px");
+        t += 0.05;
+    }, 50);
+    Mixer.stopTimeout = window.setTimeout(function() {
+        Mixer.pause();
+    }, Mixer.timelineDuration * 1000);
+};
+
+Mixer.pause = function() {
+    window.clearTimeout(Mixer.stopTimeout);
+    window.clearInterval(Mixer.pipeInterval);
+    for (var i = 0; i < Sample.collection.length; ++i) {
+        if (Sample.collection[i] !== undefined)
+            Sample.collection[i].pause();
+    }
+    Mixer.pipe.hide();
+    Mixer.playPauseButton.removeClass("icon-pause").addClass("icon-play");
+    Mixer.isPlaying = false;
+};
+
+Mixer.actualizeTimes = function() {
+    Mixer.timeLabels.children(".time-item").remove();
+    var t = 0;
+    while (t < Mixer.timelineDuration) {
+        var timeItem = $('<div class="time-item"></div>');
+        timeItem.css("left", (t * Mixer.pixelsPerSecond) + "px");
+        timeItem.text(t + "s");
+        timeItem.appendTo(Mixer.timeLabels);
+        ++t;
+    }
 };
 
 Mixer.tracks = [];
 Mixer.audios = [];
 Mixer.pixelsPerSecond = 0;
 Mixer.timelineDuration = 0;
-Mixer.trackHeadsDom = null;
-Mixer.trackTimelinesDom = null;
-Mixer.audiosDom = null;
-Mixer.newTrackButton = null;
 Mixer.draggedSample = null;
+Mixer.isPlaying = false;
