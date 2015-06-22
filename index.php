@@ -8,6 +8,9 @@
 
 session_start();
 
+include_once "exceptions/FileNotFoundException.php";
+include_once "exceptions/ClassNotFoundException.php";
+include_once "exceptions/MethodNotFoundException.php";
 include_once "Router.php";
 include_once "Loader.php";
 include_once "Template.php";
@@ -17,8 +20,23 @@ new Loader();
 $controller = Router::getController();
 $action = Router::getAction();
 
-$controller = new $controller;
-$controller->$action();
+try {
+    if (!class_exists($controller))
+        throw new ClassNotFoundException();
+    $controller = new $controller;
+    if (!method_exists($controller, $action))
+        throw new MethodNotFoundException();
+    $controller->$action();
+} catch ( FileNotFoundException $e ) {
+    Router::error404();
+    die();
+} catch ( ClassNotFoundException $e ) {
+    Router::error404();
+    die();
+} catch ( MethodNotFoundException $e ) {
+    Router::error404();
+    die();
+}
 
 unset($_SESSION["message"]);
 unset($_SESSION["message-class"]);

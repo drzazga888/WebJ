@@ -8,6 +8,23 @@
 
 class Router {
 
+    public static function error404() {
+
+        //creating and seting
+        $baseTop = new Template("base_top");
+        $baseTop->setVar("description", "Strony nie znaleziono");
+        $baseTop->setVar("title", $baseTop->getVar("description") . " - WebJ");
+        $error404 = new Template("error404");
+        $baseBottom = new Template("base_bottom");
+        $baseBottom->loadScript("scripts");
+
+        // rendering
+        $baseTop->render();
+        $error404->render();
+        $baseBottom->render();
+
+    }
+
     public static function getController() {
         if (isset($_GET["controller"]))
             return self::toCammelCase($_GET["controller"], true)."Controller";

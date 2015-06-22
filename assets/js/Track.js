@@ -2,10 +2,10 @@ function Track() {
     this.samples = [];
     this.id = Track.counter++;
     this.name = "Track #<em>" + this.id + "</em>";
-    this.headDom = $('<div data-id="' + this.id + '" class="track track-head">\
-        <h4>' + this.name + '</h4>\
-        <p class="icon-cancel track-deleter">Usuń</p>\
-        </div>');
+    this.headDom = $('<div data-id="' + this.id + '" class="track track-head">' +
+        '<h4>' + this.name + '</h4>' +
+        '<p class="icon-cancel track-deleter">Usuń</p>' +
+        '</div>');
     this.timelineDom = $('<div data-id="' + this.id + '" class="track timeline"></div>');
     this.timelineDom[0].addEventListener("dragenter", Track.events.dragenter, true);
     this.timelineDom[0].addEventListener("dragleave", Track.events.dragleave, true);

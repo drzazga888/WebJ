@@ -50,10 +50,14 @@ function Mixer(timelineDuration, pixelsPerSecond) {
         Mixer.setPixelsPerSecond(Mixer.pixelsPerSecond * 0.625);
     });
     Mixer.playPauseButton.on("click", function(event) {
-        if (!Mixer.isPlaying)
+        if (!Mixer.isPlaying) {
             Mixer.play();
-        else
+            Mixer.trackTimelinesDom.addClass("dragging");
+        }
+        else {
             Mixer.pause();
+            Mixer.trackTimelinesDom.removeClass("dragging");
+        }
     });
     Mixer.timelineDurationChanger.on("change", function(event) {
         Mixer.setTimelineDuration(event.target.value);
@@ -80,6 +84,14 @@ Mixer.addTrack = function(track) {
 Mixer.removeTrack = function(id) {
     this.tracks[id].headDom.remove();
     this.tracks[id].timelineDom.remove();
+    for (var i = 0; i < this.tracks[id].samples.length; ++i) {
+        for (var j = 0; j < Sample.collection.length; ++j) {
+            if (this.tracks[id].samples[i] === Sample.collection[j]) {
+                Sample.collection[j] = undefined;
+                break;
+            }
+        }
+    }
     this.tracks[id] = null;
 };
 
@@ -104,8 +116,10 @@ Mixer.setPixelsPerSecond = function(pixelsPerSecond) {
     Mixer.trackTimelinesDom.css( {
         width: (Mixer.timelineDuration * Mixer.pixelsPerSecond) + "px"
     });
-    for (var i = 0; i < Sample.collection.length; ++i)
-        Sample.collection[i].changeScale(pixelsPerSecond);
+    for (var i = 0; i < Sample.collection.length; ++i) {
+        if (Sample.collection[i] !== undefined)
+            Sample.collection[i].changeScale(pixelsPerSecond);
+    }
     Mixer.actualizeTimes();
 };
 

@@ -11,6 +11,11 @@ class Loader {
     public function __construct() {
         spl_autoload_register(array($this, "importController"));
         spl_autoload_register(array($this, "importModel"));
+        spl_autoload_register(array($this, "throwFileNotFoundException"));
+    }
+
+    private function throwFileNotFoundException($className) {
+        throw new FileNotFoundException;
     }
 
     private function importModel($className) {
