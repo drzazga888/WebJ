@@ -9,9 +9,7 @@ function Sample(when, offset, duration, audio, pixelsPerSecond, id) {
     if (id !== undefined) {
         this.id = id;
         this.dom.data("id", id);
-        Sample.collection[this.id] = this;
-        if (id + 1 > Sample.counter)
-            Sample.counter = id + 1;
+        Sample.collection[id] = this;
     }
     this.pixelsPerSecond = pixelsPerSecond;
     this.setWhen(when);
@@ -23,10 +21,27 @@ function Sample(when, offset, duration, audio, pixelsPerSecond, id) {
     this.dom.find(".offset")[0].addEventListener("change", Sample.events.changeOffset, true);
 }
 
+Sample.prototype.shorten = function() {
+    return {
+        id: this.id,
+        audioId: this.audio.id,
+        when: this.when,
+        offset: this.offset,
+        duration: this.duration
+    };
+};
+
+Sample.enlarge = function(obj, pixelsPerSecond) {
+    return new Sample(obj.when, obj.offset, obj.duration, Audio.collection[obj.audioId], pixelsPerSecond, obj.id);
+};
+
 Sample.prototype.assignId = function() {
     if (this.id !== undefined)
         return;
-    this.id = Sample.counter++;
+    var i = 0;
+    while (Sample.collection[i] !== undefined)
+        ++i;
+    this.id = i;
     this.dom.data("id", this.id);
 };
 
@@ -99,7 +114,7 @@ Sample.events = {
         Mixer.draggedSample = Sample.getSample(event.target);
         Sample.collection[Mixer.draggedSample.id] = undefined;
         var track = Track.getTrack($(event.target).closest(".track"));
-        track.samples[Mixer.draggedSample.id] = undefined;
+        track.removeSample(Mixer.draggedSample);
         event.dataTransfer.setData("text/plain", "");
         event.dataTransfer.effectAllowed = "move";
         event.dataTransfer.dropEffect = "move";
@@ -123,5 +138,4 @@ Sample.events = {
 
 };
 
-Sample.counter = 0;
 Sample.collection = [];

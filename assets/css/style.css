@@ -116,7 +116,7 @@ input {
 
 button,
 .button {
-    padding: 10px;
+    padding: 7px;
     font-size: 1.1em;
     margin: 0 20px 20px;
     display: inline-block;
@@ -211,6 +211,23 @@ button:hover,
     position: relative;
 }
 
+.inline-form * {
+    display: inline-block;
+}
+
+.inline-form input {
+    width: 300px;
+    border: none;
+    border-radius: 0;
+    background: none;
+    border-bottom: solid 2px #579;
+    font-size: 1em;
+}
+
+.inline-form input:focus {
+    border-color: #FFCE00;
+}
+
 /* mixer */
 
 #tracks {
@@ -262,6 +279,21 @@ button:hover,
 #tracks .timeline {
     margin: 20px 0;
     height: 100px;
+}
+
+#tracks .track-head input {
+    border: none;
+    background: none;
+    border-bottom: solid 2px #579;
+    border-radius: 0;
+    width: 120px;
+    font-size: 1em;
+    margin: 10px 0 0 20px;
+    padding: 0;
+}
+
+#tracks .track-head input:focus {
+    border-color: #FFCE00;
 }
 
 #tracks .timeline {

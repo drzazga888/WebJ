@@ -1,6 +1,6 @@
-function Audio(name) {
+function Audio(name, id) {
     this.name = name;
-    this.id = Audio.counter++;
+    this.id = id;
     this.source = null;
     this.buffer = null;
     this.dom = $('<div data-id="' + this.id + '" class="audio button icon-play" draggable="true">' + this.name + '</div>');
@@ -10,6 +10,17 @@ function Audio(name) {
     Audio.collection[this.id] = this;
     this.loadBuffer();
 }
+
+Audio.prototype.shorten = function() {
+    return {
+        id: this.id,
+        name: this.name
+    };
+};
+
+Audio.enlarge = function(obj) {
+    return new Audio(obj.name, obj.id);
+};
 
 Audio.prototype.loadBuffer = function() {
     var request = new XMLHttpRequest();
@@ -85,4 +96,3 @@ Audio.events = {
 
 Audio.collection = [];
 Audio.ctx = new AudioContext();
-Audio.counter = 0;

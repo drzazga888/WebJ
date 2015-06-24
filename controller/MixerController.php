@@ -11,7 +11,7 @@ class MixerController extends Controller {
     public function perform() {
 
         if (!isset($_SESSION["logged"]))
-            self::redirect("Musisz się zalogować by skorzystać z mixera!", "danger");
+            self::redirect("Musisz się zalogować by skorzystać z mixera!");
 
         //creating and seting
         $baseTop = new Template("base_top");
