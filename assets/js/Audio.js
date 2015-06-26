@@ -73,7 +73,7 @@ Audio.events = {
         if (!audio.buffer)
             return false;
         Mixer.draggedSample = new Sample(0, 0, audio.buffer.duration, audio, Mixer.pixelsPerSecond);
-        event.dataTransfer.setData("text/plain", "");
+        event.dataTransfer.setData("text/plain", "0");
         event.dataTransfer.effectAllowed = "move";
         event.dataTransfer.dropEffect = "move";
         Mixer.trackTimelinesDom.addClass("dragging");

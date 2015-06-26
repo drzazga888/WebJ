@@ -34,6 +34,7 @@ abstract class Model {
             $stmt->bindParam(':' . $name, $params[$name], PDO::PARAM_STR);
         $stmt->execute();
         $stmt->closeCursor();
+        return $this->pdo->lastInsertId();
     }
 
     protected function select($table, $names = array("*"), $where = null) {
@@ -49,6 +50,20 @@ abstract class Model {
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $stmt->closeCursor();
         return $result;
+    }
+
+    protected function update($table, $values, $where = null) {
+        $query = 'update ' . $table . ' set ';
+        foreach ($values as $name => $value)
+            $query .= $name . '=:' . $name . ', ';
+        if ($where)
+            $query .= ' where ' . $where;
+        $stmt = $this->pdo->prepare($query);
+        foreach ($values as $name => $value)
+            $stmt->bindParam(':' . $name, $values[$name], PDO::PARAM_STR);
+        $stmt->execute();
+        $stmt->closeCursor();
+        return $this->pdo->lastInsertId();
     }
 
 }

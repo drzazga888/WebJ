@@ -36,7 +36,11 @@ Track.prototype.shorten = function() {
 };
 
 Track.enlarge = function(obj) {
-    var track = new Track(obj.id, obj.name);
+    var track;
+    if (!obj.id && !obj.name)
+        track = new Track(obj.id, obj.name);
+    else
+        track = new Track();
     for (var i = 0; i < obj.samples.length; ++i) {
         var sample = Sample.enlarge(obj.samples[i], Mixer.pixelsPerSecond);
         track.samples.push(sample);
@@ -85,7 +89,8 @@ Track.events = {
 
     dragover: function(event) {
         event.preventDefault();
-        Mixer.draggedSample.setWhen((event.layerX / Mixer.draggedSample.pixelsPerSecond) - (Mixer.draggedSample.duration * 0.5));
+        var elemLayerX = event.dataTransfer.getData("text/plain");
+        Mixer.draggedSample.setWhen((event.layerX - elemLayerX) / Mixer.draggedSample.pixelsPerSecond);
     },
 
     dragleave: function(event) {

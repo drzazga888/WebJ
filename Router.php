@@ -37,6 +37,15 @@ class Router {
         return "perform";
     }
 
+    public static function getParams() {
+        $params = array();
+        foreach ($_GET as $name => $value) {
+            if ($name != "controller" && $name != "action")
+                $params[$name] = $value;
+        }
+        return $params;
+    }
+
     private static function toCammelCase($target, $isFirstBig) {
         $exploded = explode("-", $target);
         $buildedString = "";

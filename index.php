@@ -19,6 +19,7 @@ new Loader();
 
 $controller = Router::getController();
 $action = Router::getAction();
+$params = Router::getParams();
 
 try {
     if (!class_exists($controller))
@@ -26,7 +27,7 @@ try {
     $controller = new $controller;
     if (!method_exists($controller, $action))
         throw new MethodNotFoundException();
-    $controller->$action();
+    $controller->$action($params);
 } catch ( FileNotFoundException $e ) {
     Router::error404();
     die();

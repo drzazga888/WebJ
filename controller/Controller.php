@@ -8,7 +8,7 @@
 
 abstract class Controller {
 
-    public static function redirect($message = null, $messageClass = null, $controller = "main", $action = "perform") {
+    public static function redirect($message = null, $messageClass = null, $controller = "main", $action = "perform", $params = array()) {
         if ($message === null)
             unset($_SESSION["message"]);
         else
@@ -17,7 +17,11 @@ abstract class Controller {
             unset($_SESSION["message-class"]);
         else
             $_SESSION["message-class"] = $messageClass;
-        header("Location: /?controller=" . $controller . "&action=" . $action);
+        $url = "/?controller=" . $controller . "&action=" . $action;
+        foreach ($params as $name => $value) {
+            $url .= '&' . $name . '=' . $value;
+        }
+        header("Location: " . $url);
         die();
     }
 

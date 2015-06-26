@@ -8,7 +8,7 @@
 
 class DocsController {
 
-    public function perform() {
+    public function perform($params) {
 
         //creating and seting
         $baseTop = new Template("base_top");

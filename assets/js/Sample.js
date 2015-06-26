@@ -115,7 +115,7 @@ Sample.events = {
         Sample.collection[Mixer.draggedSample.id] = undefined;
         var track = Track.getTrack($(event.target).closest(".track"));
         track.removeSample(Mixer.draggedSample);
-        event.dataTransfer.setData("text/plain", "");
+        event.dataTransfer.setData("text/plain", event.layerX);
         event.dataTransfer.effectAllowed = "move";
         event.dataTransfer.dropEffect = "move";
         Mixer.trackTimelinesDom.addClass("dragging");

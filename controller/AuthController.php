@@ -8,7 +8,7 @@
 
 class AuthController extends Controller {
 
-    public function register() {
+    public function register($params) {
 
         //creating and seting
         $baseTop = new Template("base_top");
@@ -26,7 +26,7 @@ class AuthController extends Controller {
 
     }
 
-    public function login() {
+    public function login($params) {
 
         //creating and seting
         $baseTop = new Template("base_top");
@@ -43,14 +43,14 @@ class AuthController extends Controller {
 
     }
 
-    public function logout() {
+    public function logout($params) {
 
         unset($_SESSION["logged"]);
         self::redirect("Wylogowano pomyślnie.", "");
 
     }
 
-    public function registerToDb() {
+    public function registerToDb($params) {
 
         $form = array(
             "email" => $_POST["email"],
@@ -74,7 +74,7 @@ class AuthController extends Controller {
 
     }
 
-    public function loginToDb() {
+    public function loginToDb($params) {
 
         $form = array(
             "email" => $_POST["email"],
