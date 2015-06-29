@@ -1,3 +1,9 @@
+/**
+ * Konstruktor obiektu Track - reperezentuje on pojedyńczą ścieżkę z samplami
+ * @param id - nr id ścieżki
+ * @param name - nazwa ścieżki
+ * @constructor
+ */
 function Track(id, name) {
     this.samples = [];
     if (id !== undefined)
@@ -10,7 +16,7 @@ function Track(id, name) {
         this.name = "Track #" + this.id;
     this.headDom = $('<div data-id="' + this.id + '" class="track track-head">' +
         '<input type="text" class="name" value="' + this.name + '" required />' +
-        '<p class="icon-cancel track-deleter">Usuń</p>' +
+        '<p class="icon-cancel deleter">Usuń</p>' +
         '</div>');
     this.timelineDom = $('<div data-id="' + this.id + '" class="track timeline"></div>');
     this.timelineDom[0].addEventListener("dragenter", Track.events.dragenter, true);
@@ -20,6 +26,10 @@ function Track(id, name) {
     this.headDom.find(".name")[0].addEventListener("change", Track.events.changeName, true);
 }
 
+/**
+ * Metoda zwraca skróconą wersję obiektu Track
+ * @returns {{id: *, name: *, samples: Array}} - skrócona wersja tracka
+ */
 Track.prototype.shorten = function() {
     var obj = {
         id: this.id,
@@ -35,9 +45,14 @@ Track.prototype.shorten = function() {
     return obj;
 };
 
+/**
+ * Metoda zwraca pełny obiekt Track na podstawie jego skróconej wersji
+ * @param obj - skrócona wersja tracka
+ * @returns {*} - pełny obiekt Track
+ */
 Track.enlarge = function(obj) {
     var track;
-    if (!obj.id && !obj.name)
+    if (obj.id !== null && obj.name !== null)
         track = new Track(obj.id, obj.name);
     else
         track = new Track();
@@ -49,6 +64,9 @@ Track.enlarge = function(obj) {
     return track;
 };
 
+/**
+ * Metoda przypisuje nr ID do ścieżki
+ */
 Track.prototype.assignId = function() {
     if (this.id !== undefined)
         return;
@@ -58,11 +76,19 @@ Track.prototype.assignId = function() {
     this.id = i;
 };
 
+/**
+ * Metoda dodaje sampla do ścieżki
+ * @param sample - sample do dodania
+ */
 Track.prototype.addSample = function(sample) {
     this.samples.push(sample);
     this.timelineDom.append(sample.dom);
 };
 
+/**
+ * Metoda usuwa sample ze ścieżki
+ * @param sample - sample do usunięcia (odczepienia) od tracka
+ */
 Track.prototype.removeSample = function(sample) {
     for (var i = 0; i < this.samples.length; ++i) {
         if (this.samples[i] === sample) {
@@ -79,26 +105,46 @@ Track.prototype.removeSample = function(sample) {
         ", gdyż go tam nie ma");
 };
 
+/**
+ * Obiekt zbiorczy na funkcje obsługujące zdarzenia
+ * @type {{dragenter: Function, dragover: Function, dragleave: Function, drop: Function, changeName: Function}}
+ */
 Track.events = {
 
+    /**
+     * Metoda wywoływana gdy przeniesiemy plik muzyczny na ścieżkę
+     * @param event - obiekt typu Event - zawiera informacje do obsługi żądanie, generowany automatycznie
+     */
     dragenter: function(event) {
         $(event.target).addClass("emphase");
         var track = Track.getTrack(event.target);
         Mixer.draggedSample.dom.appendTo(track.timelineDom);
     },
 
+    /**
+     * Metoda wywoływana gdy przesuwamy samplem po ścieżce
+     * @param event - obiekt typu Event - zawiera informacje do obsługi żądanie, generowany automatycznie
+     */
     dragover: function(event) {
         event.preventDefault();
         var elemLayerX = event.dataTransfer.getData("text/plain");
         Mixer.draggedSample.setWhen((event.layerX - elemLayerX) / Mixer.draggedSample.pixelsPerSecond);
     },
 
+    /**
+     * Metoda wywoływana, gdy przeniesiemy sampla poza ścieżkę
+     * @param event - obiekt typu Event - zawiera informacje do obsługi żądanie, generowany automatycznie
+     */
     dragleave: function(event) {
         $(event.target).removeClass("emphase");
         Mixer.draggedSample.dom.remove();
         Mixer.draggedSample.dom.data("id", Mixer.draggedSample.id);
     },
 
+    /**
+     * Metoda wywoływana, gdy plik muzyki upuścimy na tracku
+     * @param event
+     */
     drop: function(event) {
         event.preventDefault();
         $(event.target).removeClass("emphase");
@@ -110,13 +156,23 @@ Track.events = {
         Mixer.draggedSample = null;
     },
 
+    /**
+     * Metoda wywoływana, gdy zmieniamy nazwę ścieżki z muzyką
+     * @param event
+     */
     changeName: function(event) {
         var track = Track.getTrack(event.target);
         track.name = event.target.value;
+        Storage.actualize();
     }
 
 };
 
+/**
+ * Metoda zwraca tracka na podstawie DOM
+ * @param dom - obiekt typu DOM - Document Object Model
+ * @returns {*} - obiekt typu Track
+ */
 Track.getTrack = function(dom) {
     return Mixer.tracks[$(dom).closest(".track").data("id")];
 };

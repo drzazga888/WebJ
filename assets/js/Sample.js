@@ -1,3 +1,13 @@
+/**
+ * Konstruktor obiektu Sample - jest to już przeciągnięty fragment muzyki na ścieżkę muzyczną
+ * @param when - czas startu grania muzyki, w sekundach
+ * @param offset - przesunięcie grania muzyki względem początku wzorcowego kawałka audio, w sekundach
+ * @param duration - czas trwania kawałka, w sekundach
+ * @param audio - obiekt Audio, służy jako odniesienie do konkretnego fragmentu muzyki wstawionego w linię czasu
+ * @param pixelsPerSecond - ilość pikseli (w szerokości) na sekundę - stosunek rozciągnięcia - parametr służy obiektowi do odpowiedniego wyskalowania samego siebie na linii czasu
+ * @param id - nr identyfikacyjny
+ * @constructor
+ */
 function Sample(when, offset, duration, audio, pixelsPerSecond, id) {
     this.isPlaying = false;
     this.audio = audio;
@@ -21,6 +31,10 @@ function Sample(when, offset, duration, audio, pixelsPerSecond, id) {
     this.dom.find(".offset")[0].addEventListener("change", Sample.events.changeOffset, true);
 }
 
+/**
+ * Metoda przygotowuje skróconą wersję obiektu typu Sample
+ * @returns {{id: *, audioId: (*|obj.id|string|Track.id|Audio.id|Mixer.id), when: *, offset: *, duration: *}}
+ */
 Sample.prototype.shorten = function() {
     return {
         id: this.id,
@@ -31,10 +45,19 @@ Sample.prototype.shorten = function() {
     };
 };
 
+/**
+ * Metoda zwraca utworzony pełny obiekt typu Sample na podstawie jego skróconej wersji
+ * @param obj - skrócona wersja Sample
+ * @param pixelsPerSecond - ilość (w szerokości) pikseli na sekundę - przybliżenie widzenia sampla
+ * @returns {Sample} - utworzony obiekt Sample
+ */
 Sample.enlarge = function(obj, pixelsPerSecond) {
     return new Sample(obj.when, obj.offset, obj.duration, Audio.collection[obj.audioId], pixelsPerSecond, obj.id);
 };
 
+/**
+ * Metoda przypisuje odpowiednie ID do sample, jeśli nie jest ustawione
+ */
 Sample.prototype.assignId = function() {
     if (this.id !== undefined)
         return;
@@ -45,6 +68,9 @@ Sample.prototype.assignId = function() {
     this.dom.data("id", this.id);
 };
 
+/**
+ * Metoda puszcza muzykę reprezentowaną przez obiekt Sample
+ */
 Sample.prototype.play = function() {
     if (!this.audio.buffer || this.isPlaying)
         return;
@@ -65,6 +91,9 @@ Sample.prototype.play = function() {
     }, sample.when * 1000);
 };
 
+/**
+ * Metoda zatrzymuje muzykę
+ */
 Sample.prototype.pause = function() {
     window.clearTimeout(this.stopTimeout);
     window.clearTimeout(this.startTimeout);
@@ -77,11 +106,19 @@ Sample.prototype.pause = function() {
     this.isPlaying = false;
 };
 
+/**
+ * Metoda ustawia czas rozpoczęcia grania Sampla
+ * @param when - czas rozpoczęcia w sekundach
+ */
 Sample.prototype.setWhen = function(when) {
     this.when = when > 0 ? when : 0;
     this.dom.css("left", (this.when * this.pixelsPerSecond) + "px");
 };
 
+/**
+ * Metoda ustawia przesunięcie odtwarzanej muzyki
+ * @param offset - czas przesunięcia w sekundach
+ */
 Sample.prototype.setOffset = function(offset) {
     offset = Number(offset);
     if (isNaN(offset))
@@ -90,6 +127,10 @@ Sample.prototype.setOffset = function(offset) {
     this.dom.find(".offset").val(offset.toFixed(2));
 };
 
+/**
+ * Metoda ustawia czas trwania Sampla
+ * @param duration - czas trwania sampal w sekundach
+ */
 Sample.prototype.setDuration = function(duration) {
     if (isNaN(duration))
         return;
@@ -98,18 +139,35 @@ Sample.prototype.setDuration = function(duration) {
     this.dom.find(".duration").val(Number(duration).toFixed(2));
 };
 
+/**
+ * Metoda zmienia skalę podglądu sampla na linii czasu
+ * @param pixelsPerSecond - ilość pikseli na sekundę (w szerokości)
+ */
 Sample.prototype.changeScale = function(pixelsPerSecond) {
     this.pixelsPerSecond = pixelsPerSecond;
     this.dom.css("width", (this.duration * this.pixelsPerSecond) + "px");
     this.dom.css("left", (this.when * this.pixelsPerSecond) + "px");
 };
 
+/**
+ * Funkcja zwraca obiekt typu Sample na podstawie DOM tego obiektu
+ * @param dom - obiekt DOM - Document Object Model
+ * @returns {*} - obiekt Sample
+ */
 Sample.getSample = function(dom) {
     return Sample.collection[$(dom).closest(".sample").data("id")];
 };
 
+/**
+ * Obiekt zbiorczy na funkcję obsługujące zdarzenia
+ * @type {{dragstart: Function, dragend: Function, changeDuration: Function, changeOffset: Function}}
+ */
 Sample.events = {
 
+    /**
+     * Metoda wywoływana, gdy zaczynamy przenosić nasze sample
+     * @param event - obiekt typu Event - zawiera informacje do obsługi żądanie, generowany automatycznie
+     */
     dragstart: function(event) {
         Mixer.draggedSample = Sample.getSample(event.target);
         Sample.collection[Mixer.draggedSample.id] = undefined;
@@ -121,19 +179,34 @@ Sample.events = {
         Mixer.trackTimelinesDom.addClass("dragging");
     },
 
+    /**
+     * Metoda wywoływana podczas zakończenia przenoszania sampla
+     * @param event - obiekt typu Event - zawiera informacje do obsługi żądanie, generowany automatycznie
+     */
     dragend: function(event) {
         Mixer.trackTimelinesDom.removeClass("dragging");
         Mixer.draggedSample = null;
+        Storage.actualize();
     },
 
+    /**
+     * Metoda wywoływana, gdy użytkownik zmieni czas trwania sampla
+     * @param event - obiekt typu Event - zawiera informacje do obsługi żądanie, generowany automatycznie
+     */
     changeDuration: function(event) {
         var sample = Sample.getSample(event.target);
         sample.setDuration(event.target.value);
+        Storage.actualize();
     },
 
+    /**
+     * Metoda wywoływana, gdy użytkownik zmeni przesunięcie sampla
+     * @param event - obiekt typu Event - zawiera informacje do obsługi żądanie, generowany automatycznie
+     */
     changeOffset: function(event) {
         var sample = Sample.getSample(event.target);
         sample.setOffset(event.target.value);
+        Storage.actualize();
     }
 
 };

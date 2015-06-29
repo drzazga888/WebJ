@@ -1,10 +1,16 @@
 <section>
     <h3>Dostępne utwory</h3>
-    <ul>
-        <li><a href="#">Makarena</a></li>
-        <li><a href="#">Jesteś tu?</a></li>
-        <li><a href="#">Czekam tu kochany bo mam na ciebie chrapkę!</a></li>
-        <li><a href="#">Nie ma mleczka do kawy!</a></li>
-    </ul>
+    <?php if (count($songs) > 0): ?>
+        <ul class="deletable-list">
+            <?php foreach ($songs as $song): ?>
+                <li>
+                    <a class="icon-cancel deleter" href="/?controller=song&action=delete&id=<?= $song["id"] ?>">Usuń</a>
+                    <a href="/?controller=song&action=mix&id=<?= $song["id"] ?>">(ID#<?= $song["id"] ?>), <?= $song["name"] ?></a>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php else: ?>
+        <p>Brak utworów</p>
+    <?php endif; ?>
     <a href="/?controller=song&action=create"><button class="icon-plus">Dodaj nowy utwór</button></a>
 </section>

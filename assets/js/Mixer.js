@@ -1,15 +1,17 @@
-$(document).ready(function() {
-
-    Mixer.init(80);
-    Mixer.parse(content);
-
-});
-
+/**
+ * Globalna inicjalizacja obiektu Mixer.
+ * Mixer jest obiektem zbiorczym na wszystkie elementy, które są używanie by stworzyć muzykę.
+ * @type {{}}
+ */
 var Mixer = {};
 
+/**
+ * "Nazwany konstruktor" obiektu Mixer, powinien zostać wywołany od razu po załadowaniu strony (onload lub $.ready)
+ * @param pixelsPerSecond - początkowa wartość "rozciągnięcia" miksera - wskazuje ilość pikseli (w szerokości) która przypada na 1s trwania utworu
+ */
 Mixer.init = function(pixelsPerSecond) {
 
-    // dom init
+    // DOM (jQuery objects) init
     var tracksDom = $("#tracks");
     Mixer.trackHeadsDom = tracksDom.children("aside");
     Mixer.trackTimelinesDom = tracksDom.find(".timelines");
@@ -27,7 +29,7 @@ Mixer.init = function(pixelsPerSecond) {
     Mixer.newTrackButton.on("click", function() {
         Mixer.addTrack(new Track());
     });
-    Mixer.trackHeadsDom.on("click", ".track-deleter", function(event) {
+    Mixer.trackHeadsDom.on("click", ".deleter", function(event) {
         Mixer.removeTrack($(this).closest(".track").data("id"));
     });
     Mixer.zoomIn.on("click", function(event) {
@@ -51,10 +53,14 @@ Mixer.init = function(pixelsPerSecond) {
 
     // setting params
     Mixer.setPixelsPerSecond(pixelsPerSecond);
-    Mixer.setName("bez nazwy");
+    Mixer.id = Number($("#song-id").text());
 
 };
 
+/**
+ * Metoda przekształca obiekt w jego reprezentację w formacie JSON
+ * @returns {*} - napis w formacie JSON
+ */
 Mixer.stringify = function() {
     var obj = {
         timelineDuration: this.timelineDuration,
@@ -64,20 +70,20 @@ Mixer.stringify = function() {
     };
     var i;
     for (i = 0; i < this.audios.length; ++i) {
-        if (this.audios[i] !== undefined)
+        if (this.audios[i])
             obj.audios.push(this.audios[i].shorten());
-        else
-            obj.audios.push(undefined);
     }
     for (i = 0; i < this.tracks.length; ++i) {
-        if (this.tracks[i] !== undefined)
+        if (this.tracks[i])
             obj.tracks.push(this.tracks[i].shorten());
-        else
-            obj.tracks.push(undefined);
     }
     return JSON.stringify(obj);
 };
 
+/**
+ * Funkcja parsuje napis w formacie JSON (czyli skróconą reprezentację obiektu Mixer) w wyniku czego zostanie ustawiony odpowiedni stan całego miksera
+ * @param stringified - napis do sparsowania
+ */
 Mixer.parse = function(stringified) {
     var obj = JSON.parse(stringified);
     var i;
@@ -90,17 +96,30 @@ Mixer.parse = function(stringified) {
     Mixer.setName(obj.name);
 };
 
+/**
+ * Metoda dodaje audio do miksera (muzyka do odsłuchania przed wrzuceniem na linię czasu)
+ * @param audio - obiekt Audio do dodania
+ */
 Mixer.addAudio = function(audio) {
     this.audios[audio.id] = audio;
     audio.dom.appendTo(Mixer.audiosDom);
 };
 
+/**
+ * Metoda dodaje ścieżkę do miksera
+ * @param track - obiekt Track do dodania
+ */
 Mixer.addTrack = function(track) {
     this.tracks[track.id] = track;
     track.headDom.appendTo(Mixer.trackHeadsDom);
     track.timelineDom.appendTo(Mixer.trackTimelinesDom);
+    Storage.actualize();
 };
 
+/**
+ * Metoda usuwa ścieżkę z miksera
+ * @param id - nr id ścieżki która ma być usunięta
+ */
 Mixer.removeTrack = function(id) {
     this.tracks[id].headDom.remove();
     this.tracks[id].timelineDom.remove();
@@ -113,16 +132,26 @@ Mixer.removeTrack = function(id) {
         }
     }
     this.tracks[id] = undefined;
+    Storage.actualize();
 };
 
+/**
+ * Metoda ustawia czas trwania utworu
+ * @param duration - nowy czas trwania utworu w sekundach
+ */
 Mixer.setTimelineDuration = function(duration) {
     Mixer.timelineDuration = duration;
     Mixer.trackTimelinesDom.css( {
         width: duration * Mixer.pixelsPerSecond + "px"
     });
     Mixer.actualizeTimes();
+    Storage.actualize();
 };
 
+/**
+ * Metoda ustawia współczynnik "rozciągnięcia" linii czasu - jest to ilość pikseli (w szerokości) na 1 sekundę trwania utworu
+ * @param pixelsPerSecond - ilość pikseli na sekundę
+ */
 Mixer.setPixelsPerSecond = function(pixelsPerSecond) {
     Mixer.pixelsPerSecond = pixelsPerSecond;
     var incrementValue = Math.ceil(30 / Mixer.pixelsPerSecond);
@@ -144,6 +173,9 @@ Mixer.setPixelsPerSecond = function(pixelsPerSecond) {
     Mixer.actualizeTimes();
 };
 
+/**
+ * Metoda odtwarza cały utwór
+ */
 Mixer.play = function() {
     Mixer.isPlaying = true;
     for (var i = 0; i < Sample.collection.length; ++i) {
@@ -164,6 +196,9 @@ Mixer.play = function() {
     }, Mixer.timelineDuration * 1000);
 };
 
+/**
+ * Metoda pauzuje puszczony utwór
+ */
 Mixer.pause = function() {
     window.clearTimeout(Mixer.stopTimeout);
     window.clearInterval(Mixer.pipeInterval);
@@ -177,6 +212,9 @@ Mixer.pause = function() {
     Mixer.isPlaying = false;
 };
 
+/**
+ * Metoda, która powinna być wowołana gdy chcemu zaktualizować czasy cząstkowe trwania utworu (napisy typu "1s", "2s", ...)
+ */
 Mixer.actualizeTimes = function() {
     Mixer.timeLabels.children(".time-item").remove();
     var t = 0;
@@ -190,9 +228,14 @@ Mixer.actualizeTimes = function() {
     }
 };
 
+/**
+ * Metoda ustawia nazwę utworu
+ * @param name - nowa nazwa utworu
+ */
 Mixer.setName = function(name) {
     Mixer.mixerName.val(name);
     Mixer.name = name;
+    Storage.actualize();
 };
 
 Mixer.tracks = [];
@@ -202,3 +245,4 @@ Mixer.timelineDuration = 0;
 Mixer.draggedSample = null;
 Mixer.name = null;
 Mixer.isPlaying = false;
+Mixer.id = null;

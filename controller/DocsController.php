@@ -1,13 +1,14 @@
 <?php
+
 /**
- * Created by PhpStorm.
- * User: kamil
- * Date: 17.06.15
- * Time: 00:57
+ * Class DocsController - obsługuje żądania związane z dokumentacją
  */
+class DocsController extends Controller {
 
-class DocsController {
-
+    /**
+     * Domyślna funckja kontrolera, która wyświetla dokumentację
+     * @param $params - parametry wywołania (nieużywane!)
+     */
     public function perform($params) {
 
         //creating and seting

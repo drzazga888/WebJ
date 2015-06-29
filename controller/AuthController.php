@@ -1,13 +1,14 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: kamil
- * Date: 17.06.15
- * Time: 04:06
- */
 
+/**
+ * Class AuthController - klasa typu Controller - obsługuje żądania związane z autoryzacją (logowanie, rejestracja, wylogowywanie)
+ */
 class AuthController extends Controller {
 
+    /**
+     * Funkcja wywoływana po ty by pobrać formularz rejestracji
+     * @param $params - parametry wywołania (nieużywane!)
+     */
     public function register($params) {
 
         //creating and seting
@@ -26,6 +27,10 @@ class AuthController extends Controller {
 
     }
 
+    /**
+     * Funkcja wywoływana po ty by pobrać formularz logowania
+     * @param $params - parametry wywołania (nieużywane!)
+     */
     public function login($params) {
 
         //creating and seting
@@ -43,6 +48,10 @@ class AuthController extends Controller {
 
     }
 
+    /**
+     * Funkcja wywoływana po ty by wylogować użytkownika i przekierować go na stronę główną "/"
+     * @param $params - parametry wywołania (nieużywane!)
+     */
     public function logout($params) {
 
         unset($_SESSION["logged"]);
@@ -50,6 +59,10 @@ class AuthController extends Controller {
 
     }
 
+    /**
+     * Funkcja wywoływana po ty by zarejestrować użytkownika (w bazie danych) i przekierować go na stronę główną "/"
+     * @param $params - parametry wywołania (nieużywane!)
+     */
     public function registerToDb($params) {
 
         $form = array(
@@ -74,6 +87,10 @@ class AuthController extends Controller {
 
     }
 
+    /**
+     * Funkcja wywoływana po ty by zalogować użytkownika (tworzy zmienną sesyjną "logged") i przekierować go na stronę główną "/"
+     * @param $params - parametry wywołania (nieużywane!)
+     */
     public function loginToDb($params) {
 
         $form = array(
@@ -96,6 +113,11 @@ class AuthController extends Controller {
 
     }
 
+    /**
+     * Metoda pomocnicza, która waliduje przekazany formularz (logowania bądź rejestracji)
+     * @param $form - formularz do walidacji
+     * @throws Exception - wyjątek zostaje rzucony, gdy któryś warunek nie zostanie spełniony
+     */
     private function validate($form) {
 
         // sprawdzanie poprawności e-maila

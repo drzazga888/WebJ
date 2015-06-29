@@ -3,7 +3,7 @@
         var content = '<?= $content ?>';
     </script>
     <h3>Mixer</h3>
-    <p>ID piosenki: <?= $id ?></p>
+    <p>ID piosenki: <span id="song-id"><?= $id ?></span></p>
     <label class="inline-form">Nazwa utworu: <input type="text" id="mixer-name" required /></label>
     <div id="tracks" class="grid">
         <aside class="grid-item"></aside>
@@ -29,4 +29,9 @@
 <section>
     <h3>Dostępna muzyka</h3>
     <div id="audios"></div>
+</section>
+<section>
+    <h3>Stan aplikacji</h3>
+    <p>Online: <span id="is-online" class="online">tak</span></p>
+    <p>Dane w local storage: <span id="local-storage-last-modified"></span></p>
 </section>

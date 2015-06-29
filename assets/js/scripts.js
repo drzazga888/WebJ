@@ -1,3 +1,6 @@
+/**
+ * Dodanie funkcjonalości wysuwania i wsuwania panelu z logowanie, rejestracją i wylogowywaniem
+ */
 $(document).ready(function() {
 
     $(".dropdown-body").hide();

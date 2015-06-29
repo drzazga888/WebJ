@@ -128,12 +128,30 @@ button:hover,
     color: #72d3ff;
 }
 
+img {
+    max-width: 100%;
+}
+
 /* klasy */
 
 .stick-to-top-right-corner {
     position: absolute;
     top: 0;
     right: 0;
+}
+
+.stick-to-top-left-corner {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.online {
+    color: #0f0;
+}
+
+.offline {
+    color: #f00;
 }
 
 .menu {
@@ -226,6 +244,30 @@ button:hover,
 
 .inline-form input:focus {
     border-color: #FFCE00;
+}
+
+.deleter {
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.deleter:hover {
+    color: #ff9381;
+}
+
+.deletable-list li {
+    margin: 15px 0;
+}
+
+.deletable-list li > * {
+    display: inline-block;
+}
+
+.deletable-list .deleter {
+    background: rgba(100%, 0%, 0%, 0.2);
+    border: solid 2px #f00;
+    padding: 7px;
+    margin-right: 10px;
 }
 
 /* mixer */
@@ -334,12 +376,4 @@ button:hover,
 
 #tracks .sample:hover {
     box-shadow: #09f 0 0 10px;
-}
-
-#tracks .track-deleter {
-    cursor: pointer;
-}
-
-#tracks .track-deleter:hover {
-    color: #ff9381;
 }

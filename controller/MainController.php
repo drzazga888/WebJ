@@ -1,26 +1,27 @@
 <?php
+
 /**
- * Created by PhpStorm.
- * User: kamil
- * Date: 09.06.15
- * Time: 13:35
+ * Class MainController - obsługuje żądania związane ze stroną główną
  */
+class MainController extends Controller {
 
-class MainController {
-
+    /**
+     * Domyślna funckja kontrolera, która wyświetla stronę główną
+     * @param $params - parametry wywołania (nieużywane!)
+     */
     public function perform($params) {
 
         //creating and seting
         $baseTop = new Template("base_top");
         $baseTop->setVar("title", "WebJ");
         $baseTop->setVar("description", "Twórz muzykę gdzie tylko chcesz!");
-        $loremIpsum = new Template("lorem_ipsum");
+        $main = new Template("main");
         $baseBottom = new Template("base_bottom");
         $baseBottom->loadScript("scripts");
 
         // rendering
         $baseTop->render();
-        $loremIpsum->render();
+        $main->render();
         $baseBottom->render();
 
     }

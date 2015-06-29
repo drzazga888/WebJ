@@ -1,9 +1,27 @@
 <section>
-    <h3>Dokumentacja nr 1</h3>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum augue elit, volutpat gravida arcu non, feugiat fringilla odio. Curabitur vitae nisl enim. Aenean nec elit ut elit fermentum vestibulum sit amet et nisi. Proin id dictum lectus, ornare condimentum nulla. Aenean ut imperdiet nisl. Nulla porta porta tortor, tincidunt feugiat felis blandit nec. Donec et tincidunt lectus. Aliquam augue neque, pellentesque at placerat vel, ornare vel libero. In hac habitasse platea dictumst. Nulla nec risus eget felis luctus consequat eu ac ex. Nunc eget sem turpis.</p>
-    <p>Cras at nisi in ante gravida efficitur non ut orci. Donec tempus, erat vel convallis mattis, sem magna viverra ipsum, a consectetur sem ante ac mauris. Vestibulum auctor lacus nibh. Nunc non magna vel lorem malesuada vulputate ac eu sapien. Phasellus nec suscipit mauris, ac imperdiet lorem. In iaculis metus et risus gravida, in rutrum est tincidunt. Vestibulum tincidunt risus nec eros bibendum pellentesque. Aenean eu lorem finibus, imperdiet velit sed, luctus orci. In ullamcorper urna ac urna consectetur aliquet. Nunc ullamcorper varius elementum. Quisque quis arcu dui. Integer at neque faucibus, facilisis arcu eget, fermentum enim. Praesent nulla tellus, scelerisque eu mollis id, commodo eu nisi. Donec id felis non neque scelerisque venenatis non eget ligula. In vitae facilisis diam. Mauris purus neque, faucibus id euismod a, volutpat vel tortor.</p>
+    <h3>Klient - JavaScript</h3>
+    <p>Aplikacja po stronie klienta składa się z plików <code>js</code>.</p>
+    <p>Podkatalog: assets/js/</p>
+    <ul>
+        <li>Audio.js - zawiera obiekt Audio na podstawie którego można tworzyć obiekty które reprezentują pojedyńczy utwór do przeciągnięcia na linię czasową</li>
+        <li>Sample.js - jest tam obiekt Sample, który reprezentuje przeciągnięty utwór na track</li>
+        <li>Track.js - zawiera obiekt Track na podstawie którego można utworzyć nową linię czasową</li>
+        <li>Mixer.js - jest tam obiekt spajający wszystkie elementy miksera w całość</li>
+        <li>Storage.js- zarządza połączeniem serwerem i local storage. Wykrywanie jest tam np. czy aplikacja jest online, wysyła żądania AJAX do serwera</li>
+    </ul>
 </section>
 <section>
-    <h3>Bubak, bubak, bubak...</h3>
-    <p>Etiam vitae porttitor tellus. Etiam quis fringilla ligula, eu volutpat ligula. Mauris vitae pharetra augue, a ultrices purus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Donec in libero in mauris ultricies faucibus eu id elit. Ut at sodales purus. Nunc at rutrum velit. Nam aliquet ultricies justo. In augue eros, eleifend eu magna eu, cursus convallis ipsum. Nulla eu augue eget nibh condimentum congue eu vel est. Duis semper porttitor ligula vitae auctor. Praesent finibus nulla ac massa scelerisque imperdiet. Mauris nec dui sit amet eros congue interdum.</p>
+    <h3>Server - PHP + sqLite3</h3>
+    <p>Użyto wzorca MVC. Stworzono abstrakcję w dostępie do bazy danych (klasa abstrakcyjna Model). Wykorzystano też klasę Template, która dostarcza narzędzia do przekształcania szablonów (plików .phtml w katalogu templates) na konkretny kod html.</p>
+    <p>Na początku programu uruchamia się obiekt klasy Loader i rejestruje funkcje autoładujące klasy poleceniem <code>spl_autoloader_register</code>. Później przy użyciu klasy Router pobierane są z adresu (metoda GET) 3 elementy:</p>
+    <ul>
+        <li>controller - czyli nazwa klasy (kontroler), która ma być utworzona</li>
+        <li>action - czyli jaka metoda ma być wywołana</li>
+        <li>params - dodatkowe parametry np. id utworu</li>
+    </ul>
+    <p>Dzięki poprzednim operacją wiadomo jest jaką klasę należy utworzyć i jaką metodę wywołać by obsłużyć żądanie.</p>
+    <p>Diagram klas</p>
+    <p><img src="/assets/img/php_class_diagram.png" alt="diagram klas php" /></p>
+    <p>Diagram bazy danych</p>
+    <p><img src="/assets/img/db_diagram.png" alt="diagram bazy danych" /></p>
 </section>
