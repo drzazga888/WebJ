@@ -7,7 +7,7 @@
 
     <ul class="stick-to-top-right-corner menu">
         <li class="dropdown">
-            <?php if (!isset($_SESSION["logged"])): ?>
+            <?php if (!isset($_SESSION["user_id"])): ?>
                 <a class="icon-user" href="javascript:void(0);">Niezalogowany</a>
                 <div class="dropdown-body">
                     <p>Musisz się zalogować, by korzystać z aplikacji!</p>
@@ -17,7 +17,7 @@
             <?php else: ?>
                 <a class="icon-user" href="javascript:void(0);">Zalogowany</a>
                 <div class="dropdown-body">
-                    <p>Zalogowano jako <em><?= $_SESSION["logged"] ?></em></p>
+                    <p>Zalogowano jako <em><?= $_SESSION["user_email"] ?></em></p>
                     <p><a href="/?controller=auth&action=logout">Wylogowanie</a></p>
                 </div>
             <?php endif; ?>

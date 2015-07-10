@@ -23,9 +23,8 @@ class SongsModel extends Model {
             "name" => $newName,
             "content" => $newContext
         ));
-        $userId = $this->getUserId();
         $this->insert("users_songs", array(
-            "user_id" => $userId,
+            "user_id" => $_SESSION["user_id"],
             "song_id" => $insertedId
         ));
         return $insertedId;
@@ -58,15 +57,23 @@ class SongsModel extends Model {
      * @return array - pobrane rekordy (id i nazwa utworu, bez zawartości)
      */
     public function getAll() {
-        $userId = $this->getUserId();
         return $this->select(
             "songs, users_songs",
             array(
                 "songs.id as id",
                 "songs.name as name"
             ),
-            "users_songs.user_id=" . $userId . " and songs.id=users_songs.song_id"
+            "users_songs.user_id=" . $_SESSION["user_id"] . " and songs.id=users_songs.song_id"
         );
+    }
+
+    public function getName($id) {
+        $result = $this->select(
+            "songs",
+            array("name"),
+            "id=" . $id
+        );
+        return $result[0]["name"];
     }
 
     /**
@@ -95,15 +102,6 @@ class SongsModel extends Model {
     private function getNameFromContent($content) {
         $obj = json_decode($content, true);
         return $obj["name"];
-    }
-
-    /**
-     * Funkcja pomocnicza, zwraca nr ID zalogowanego użytkownika
-     * @return mixed - nr ID zalogowanego użytkownika
-     */
-    private function getUserId() {
-        $result = $this->select("users", array("id"), "email = '" . $_SESSION["logged"] . "'");
-        return $result[0]["id"];
     }
 
 }

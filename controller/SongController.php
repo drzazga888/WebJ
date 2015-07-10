@@ -11,7 +11,7 @@ class SongController extends Controller {
      */
     public function mix($params) {
 
-        if (!isset($_SESSION["logged"]))
+        if (!isset($_SESSION["user_id"]))
             self::redirect("Musisz się zalogować by skorzystać z mixera!");
 
         $model = new SongsModel();
@@ -46,7 +46,7 @@ class SongController extends Controller {
      */
     public function showAll($params) {
 
-        if (!isset($_SESSION["logged"]))
+        if (!isset($_SESSION["user_id"]))
             self::redirect("Musisz się zalogować by skorzystać z mixera!");
 
         $model = new SongsModel();
@@ -74,7 +74,7 @@ class SongController extends Controller {
      */
     public function create($params) {
 
-        if (!isset($_SESSION["logged"]))
+        if (!isset($_SESSION["user_id"]))
             self::redirect("Musisz się zalogować by skorzystać z mixera!");
 
         $model = new SongsModel();
@@ -92,7 +92,7 @@ class SongController extends Controller {
      */
     public function update($params) {
 
-        if (!isset($_SESSION["logged"]))
+        if (!isset($_SESSION["user_id"]))
             self::redirect("Musisz się zalogować by skorzystać z mixera!");
 
         $model = new SongsModel();
@@ -106,7 +106,7 @@ class SongController extends Controller {
      */
     public function delete($params) {
 
-        if (!isset($_SESSION["logged"]))
+        if (!isset($_SESSION["user_id"]))
             self::redirect("Musisz się zalogować by skorzystać z mixera!");
 
         $model = new SongsModel();
@@ -114,6 +114,58 @@ class SongController extends Controller {
 
         self::redirect("Piosenka została usunięta!", null, "song", "show-all");
 
+    }
+
+    public function make($params) {
+
+        if (!isset($_SESSION["user_id"]))
+            self::redirect("Musisz się zalogować by skorzystać z mixera!");
+
+        $folder = "userdata/user_" . $_SESSION["user_id"];
+        if (!file_exists($folder))
+            mkdir($folder);
+
+        $mixedAudio = $folder . "/mixed_audio.wav";
+
+        $model = new SongsModel();
+        $content = json_decode($model->getContent($params["id"]), true);
+        $samples = array();
+        foreach ($content["tracks"] as $track) {
+            foreach ($track["samples"] as $sample) {
+                $samples[] = $sample;
+            }
+        }
+        $this->soxMerge($samples, $content["timelineDuration"], $mixedAudio);
+
+        header('Content-Description: File Transfer');
+        header('Content-Type: audio/wav');
+        header('Content-Disposition: attachment; filename=' . str_replace(" ", "_", $model->getName($params["id"])));
+        header('Content-Transfer-Encoding: binary');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($mixedAudio));
+
+        readfile($mixedAudio);
+
+    }
+
+    private function soxMerge($samples, $duration, $output) {
+        //var_dump(func_get_args());
+
+        $wavs = array(
+            "userdata/share/choir_vibes.wav",
+            "userdata/share/hip_hop_drum_loop.wav",
+            "userdata/share/jammu_guitar_remake.wav"
+        );
+
+        //----------------------------------------
+        $path = "sox/src/";
+        $cmd = $path . "sox -m";
+        foreach ($wavs as $wav)
+            $cmd .= " " . $wav;
+        $cmd .= " " . $output;
+        system($cmd);
     }
 
 }

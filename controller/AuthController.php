@@ -54,7 +54,8 @@ class AuthController extends Controller {
      */
     public function logout($params) {
 
-        unset($_SESSION["logged"]);
+        unset($_SESSION["user_id"]);
+        unset($_SESSION["user_email"]);
         self::redirect("Wylogowano pomyślnie.", "");
 
     }
@@ -105,10 +106,11 @@ class AuthController extends Controller {
         }
 
         $model = new AuthModel();
-        $isLoginDataCorrect = $model->isLoginDataCorrect($form);
-        if (!$isLoginDataCorrect)
+        $userId = $model->fitLoginData($form);
+        if ($userId === false)
             self::redirect("Nie istnieje taki użytkownik.", "danger", "auth", "login");
-        $_SESSION["logged"] = $form["email"];
+        $_SESSION["user_id"] = $userId;
+        $_SESSION["user_email"] = $form["email"];
         self::redirect("Zostałeś zalogowany!", "success");
 
     }

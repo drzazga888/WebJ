@@ -28,14 +28,16 @@ class AuthModel extends Model {
      * @param $form - pobrany formularz logownia od użytkownika
      * @return mixed - 1 (true), gdy dane są prawidłowe, w przeciwnym wypadku 0 (false)
      */
-    public function isLoginDataCorrect($form) {
+    public function fitLoginData($form) {
         $form["password"] = sha1($form["password"]);
         $result = $this->select(
             "users",
-            array("count(id)"),
+            array("id"),
             "email = '" . addslashes($form["email"]) . "' and password = '" . addslashes($form["password"]) . "'"
         );
-        return $result[0]["count(id)"];
+        if (count($result) == 0)
+            return false;
+        return $result[0]["id"];
     }
 
     /**
