@@ -1,5 +1,7 @@
 <?php
 
+require_once "Producer.php";
+
 /**
  * Class SongController - klasa typu Controller, obsługuje żądania związane z utworami
  */
@@ -15,7 +17,9 @@ class SongController extends Controller {
             self::redirect("Musisz się zalogować by skorzystać z mixera!");
 
         $model = new SongsModel();
+        $audiosModel = new AudiosModel();
         $content = $model->getContent($params["id"]);
+        $audios = $audiosModel->getAllNames($_SESSION["user_id"]);
 
         //creating and seting
         $baseTop = new Template("base_top");
@@ -23,7 +27,8 @@ class SongController extends Controller {
         $baseTop->setVar("title", $baseTop->getVar("description") . " - WebJ");
         $mixer = new Template("mixer");
         $mixer->setVar("id", $params["id"]);
-        $mixer->setVar("content", $content);
+        $mixer->setVar("content", json_encode($content));
+        $mixer->setVar("audios", json_encode($audios));
         $baseBottom = new Template("base_bottom");
         $baseBottom->loadScript("scripts");
         $baseBottom->loadScript("Audio");
@@ -50,7 +55,7 @@ class SongController extends Controller {
             self::redirect("Musisz się zalogować by skorzystać z mixera!");
 
         $model = new SongsModel();
-        $songs = $model->getAll($params["id"]);
+        $songs = $model->getAll();
 
         //creating and seting
         $baseTop = new Template("base_top");
@@ -121,51 +126,14 @@ class SongController extends Controller {
         if (!isset($_SESSION["user_id"]))
             self::redirect("Musisz się zalogować by skorzystać z mixera!");
 
-        $folder = "userdata/user_" . $_SESSION["user_id"];
-        if (!file_exists($folder))
-            mkdir($folder);
-
-        $mixedAudio = $folder . "/mixed_audio.wav";
-
-        $model = new SongsModel();
-        $content = json_decode($model->getContent($params["id"]), true);
-        $samples = array();
-        foreach ($content["tracks"] as $track) {
-            foreach ($track["samples"] as $sample) {
-                $samples[] = $sample;
-            }
-        }
-        $this->soxMerge($samples, $content["timelineDuration"], $mixedAudio);
-
-        header('Content-Description: File Transfer');
-        header('Content-Type: audio/wav');
-        header('Content-Disposition: attachment; filename=' . str_replace(" ", "_", $model->getName($params["id"])));
-        header('Content-Transfer-Encoding: binary');
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        header('Pragma: public');
-        header('Content-Length: ' . filesize($mixedAudio));
-
-        readfile($mixedAudio);
-
-    }
-
-    private function soxMerge($samples, $duration, $output) {
-        //var_dump(func_get_args());
-
-        $wavs = array(
-            "userdata/share/choir_vibes.wav",
-            "userdata/share/hip_hop_drum_loop.wav",
-            "userdata/share/jammu_guitar_remake.wav"
+        $audiosModel = new AudiosModel();
+        $songsModel = new SongsModel();
+        $producer = new Producer(
+            $songsModel->getContent($params["id"]),
+            $audiosModel->getAllFilenames($_SESSION["user_id"])
         );
-
-        //----------------------------------------
-        $path = "sox/src/";
-        $cmd = $path . "sox -m";
-        foreach ($wavs as $wav)
-            $cmd .= " " . $wav;
-        $cmd .= " " . $output;
-        system($cmd);
+        $producer->make();
+        $producer->download();
     }
 
 }

@@ -18,17 +18,6 @@ function Audio(name, id) {
 }
 
 /**
- * Metoda, która przekształca obiekt Audio na krótszą jego reprezentację, wystarczającą, by w pełni odtworzyć obiekt. Używane do tworzenia JSON-a, który zostanie zapisany w localStorage i na serwerze
- * @returns {{id: *, name: *}} - skórcony obiekt obiektu Audio
- */
-Audio.prototype.shorten = function() {
-    return {
-        id: this.id,
-        name: this.name
-    };
-};
-
-/**
  * Metoda na podstawie skróconego obiektu odtwarza pierwotny obiekt Audio
  * @param obj - skrócony obiekt, w formacie {{id: *, name: *}}
  * @returns {Audio} - pełny obiekt Audio
@@ -43,7 +32,7 @@ Audio.enlarge = function(obj) {
 Audio.prototype.loadBuffer = function() {
     var request = new XMLHttpRequest();
     var audio = this;
-    request.open('GET', this.convertToUrl(), true);
+    request.open('GET', '/?controller=audio&action=get-audio&id=' + this.id, true);
     request.responseType = 'arraybuffer';
     request.onload = function() {
         Audio.ctx.decodeAudioData(request.response, function(buffer) {
@@ -51,14 +40,6 @@ Audio.prototype.loadBuffer = function() {
         });
     };
     request.send();
-};
-
-/**
- * Metoda pomocnicza, która na podstawie nazwy obiektu Audio (pole name) pozwala określić położenie pliku muzycznego i jego nazwę na serwerze
- * @returns {string} - adres pliku muzycznego na serwerze
- */
-Audio.prototype.convertToUrl = function() {
-    return "/userdata/share/" + this.name.replace(/ /g, '_').toLowerCase() + ".wav";
 };
 
 /**

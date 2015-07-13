@@ -1,5 +1,7 @@
 <?php
 
+require_once "exceptions/RowNotFoundException.php";
+
 /**
  * Class SongsModel - klasa typu Model, zarządza utworami
  */
@@ -17,11 +19,14 @@ class SongsModel extends Model {
      * @return string - nr ID wstawionego utworu
      */
     public function create() {
-        $newName = "bez nazwy";
-        $newContext = $this->getNewContent($newName);
         $insertedId = $this->insert("songs", array(
-            "name" => $newName,
-            "content" => $newContext
+            "name" => "bez nazwy",
+            "tracks" => json_encode(array(
+                array(
+                    "samples" => array()
+                )
+            )),
+            "duration" => 16.0
         ));
         $this->insert("users_songs", array(
             "user_id" => $_SESSION["user_id"],
@@ -36,19 +41,28 @@ class SongsModel extends Model {
      * @return mixed - zakodowany utwór (obiekt typu Mixer, okrojony, w formacie JSON)
      */
     public function getContent($id) {
-        $result = $this->select("songs", array("content"), "id = '" . $id . "'");
-        return $result[0]["content"];
+        $result = $this->select("songs", array(
+            "name",
+            "tracks",
+            "duration"
+        ), "id = '" . $id . "'");
+        if (count($result) == 0)
+            throw new RowNotFoundException("Nie ma utworu o ID = " . $id);
+        $result[0]["tracks"] = json_decode($result[0]["tracks"] ,true);
+        return $result[0];
     }
 
     /**
      * Metoda aktualizuje utwór
      * @param $id - nr ID utwotu
-     * @param $content - zakodowany utwór (obiekt typu Mixer, okrojony, w formacie JSON)
+     * @param $song - zakodowany utwór (obiekt typu Mixer, okrojony, w formacie JSON)
      */
-    public function update($id, $content) {
+    public function update($id, $song) {
+        $song = json_decode($song, true);
         parent::update("songs", array(
-            "name" => $this->getNameFromContent($content),
-            "content" => $content
+            "name" => $song["name"],
+            "tracks" => json_encode($song["tracks"]),
+            "duration" => $song["duration"]
         ), "id = " . $id);
     }
 
@@ -67,15 +81,6 @@ class SongsModel extends Model {
         );
     }
 
-    public function getName($id) {
-        $result = $this->select(
-            "songs",
-            array("name"),
-            "id=" . $id
-        );
-        return $result[0]["name"];
-    }
-
     /**
      * Metoda, która usuwa utwór z bazy danych
      * @param $id - nr ID utworu
@@ -83,25 +88,6 @@ class SongsModel extends Model {
     public function delete($id) {
         parent::delete("users_songs", "song_id = " . $id);
         parent::delete("songs", "id = " . $id);
-    }
-
-    /**
-     * Funkcja pomocnicza, zwraca nowy utwór w postaci JSON
-     * @param $name - nazwa utworu
-     * @return string - zakodowany utwór (obiekt typu Mixer, okrojony, w formacie JSON)
-     */
-    private function getNewContent($name) {
-        return '{"timelineDuration":"16","name":"' . $name . '","audios":[{"id":0,"name":"Beautiful Touch Pad Trap"},{"id":1,"name":"Bottem Shelf Drums"},{"id":2,"name":"Somedaydreams Chillout Guitars V2"},{"id":3,"name":"105 Upbeat Kinda"},{"id":4,"name":"Avicci Type Chords"},{"id":5,"name":"Choir Vibes"},{"id":6,"name":"Danke Piano Groovy"},{"id":7,"name":"Exfain Arptime Aminor Garvois"},{"id":8,"name":"Herotime Rotten Dam"},{"id":9,"name":"Hip Hop Drum Loop"},{"id":10,"name":"Jammu Guitar Remake"},{"id":11,"name":"My Fat Cat George Drums"}],"tracks":[{"samples":[]}]}';
-    }
-
-    /**
-     * Funckja pomocnicza, która na podstawie JSON-a zwraca nazwę utworu
-     * @param $content - zakodowany utwór (obiekt typu Mixer, okrojony, w formacie JSON)
-     * @return mixed - nazwa utworu
-     */
-    private function getNameFromContent($content) {
-        $obj = json_decode($content, true);
-        return $obj["name"];
     }
 
 }

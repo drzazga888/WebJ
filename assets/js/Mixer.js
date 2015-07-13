@@ -63,16 +63,11 @@ Mixer.init = function(pixelsPerSecond) {
  */
 Mixer.stringify = function() {
     var obj = {
-        timelineDuration: this.timelineDuration,
+        duration: this.timelineDuration,
         name: this.name,
-        audios: [],
         tracks: []
     };
     var i;
-    for (i = 0; i < this.audios.length; ++i) {
-        if (this.audios[i])
-            obj.audios.push(this.audios[i].shorten());
-    }
     for (i = 0; i < this.tracks.length; ++i) {
         if (this.tracks[i])
             obj.tracks.push(this.tracks[i].shorten());
@@ -83,16 +78,18 @@ Mixer.stringify = function() {
 /**
  * Funkcja parsuje napis w formacie JSON (czyli skróconą reprezentację obiektu Mixer) w wyniku czego zostanie ustawiony odpowiedni stan całego miksera
  * @param stringified - napis do sparsowania
+ * @param jsonAudios
  */
-Mixer.parse = function(stringified) {
+Mixer.parse = function(stringified, jsonAudios) {
     var obj = JSON.parse(stringified);
+    var objAudios = JSON.parse(jsonAudios);
     var i;
-    for (i = 0; i < obj.audios.length; ++i)
-        Mixer.addAudio(Audio.enlarge(obj.audios[i]));
+    for (i = 0; i < objAudios.length; ++i)
+        Mixer.addAudio(Audio.enlarge(objAudios[i]));
     for (i = 0; i < obj.tracks.length; ++i)
         Mixer.addTrack(Track.enlarge(obj.tracks[i]));
-    Mixer.setTimelineDuration(obj.timelineDuration);
-    Mixer.timelineDurationChanger.val(obj.timelineDuration);
+    Mixer.setTimelineDuration(obj.duration);
+    Mixer.timelineDurationChanger.val(obj.duration);
     Mixer.setName(obj.name);
 };
 
