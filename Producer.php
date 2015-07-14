@@ -8,18 +8,34 @@ class Producer
     private $extension = "wav";
     private $output = "userdata/user_{id}/mixed_audio.wav";
     private $audiosFolder = "userdata/user_{id}/audios";
+    private $trimmedFolder = "userdata/user_{id}/samples_trimmed";
+    private $paddedFolder = "userdata/user_{id}/samples_padded";
+    private $samples;
     private $audios;
     private $pattern;
 
     public function __construct(array $pattern, array $audios) {
         $this->audios = $audios;
         $this->pattern = $pattern;
+        $this->samples = $this->deflateTracks();
         $this->output = str_replace('{id}', $_SESSION["user_id"], $this->output);
         $this->audiosFolder = str_replace('{id}', $_SESSION["user_id"], $this->audiosFolder);
+        $this->trimmedFolder = str_replace('{id}', $_SESSION["user_id"], $this->trimmedFolder);
+        $this->paddedFolder = str_replace('{id}', $_SESSION["user_id"], $this->paddedFolder);
     }
 
     public function make() {
-        system($this->prepareMergingCommand());
+        var_dump($this->samples);
+        echo "<br>";
+        if (!file_exists($this->trimmedFolder))
+            mkdir($this->trimmedFolder);
+        if (!file_exists($this->paddedFolder))
+            mkdir($this->paddedFolder);
+        foreach ($this->samples as $sample) {
+            $this->trim($sample);
+            $this->pad($sample);
+        }
+        $this->merge();
     }
 
     public function download() {
@@ -34,23 +50,39 @@ class Producer
         readfile($this->output);
     }
 
-    private function prepareMergingCommand() {
+    private function trim($sample) {
+        $cmd = $this->producerPath .
+            ' ' . $this->audiosFolder . '/' . $this->audioOfSample($sample)["filename"] . '.' . $this->extension .
+            ' ' . $this->trimmedFolder . '/' . $sample["id"] . '.' . $this->extension .
+            ' trim ' . $sample['offset'] . ' ' . $sample['duration'];
+        echo $cmd . "<br>";
+        return system($cmd);
+    }
+
+    private function pad($sample) {
+        $cmd = $this->producerPath .
+            ' ' . $this->trimmedFolder . '/' . $sample["id"] . '.' . $this->extension .
+            ' ' . $this->paddedFolder . '/' . $sample["id"] . '.' . $this->extension .
+            ' pad ' . $sample['when'];
+        echo $cmd . "<br>";
+        return system($cmd);
+    }
+
+    private function merge() {
         $cmd = $this->producerPath . ' ' . $this->mergingOption;
-        $samples = $this->deflateTracks();
-        foreach ($samples as $sample) {
-            $targetAudio = null;
-            foreach ($this->audios as $audio) {
-                if ($audio["id"] == $sample["audioId"]) {
-                    $targetAudio = $audio;
-                    break;
-                }
-            }
-            if ($targetAudio === null)
-                throw new Exception("no audio found related to sample");
-            $cmd .= ' ' . $this->audiosFolder . '/' . $targetAudio["filename"] . "." . $this->extension;
-        }
+        foreach ($this->samples as $sample)
+            $cmd .= ' ' . $this->paddedFolder . '/' . $sample["id"] . '.' . $this->extension;
         $cmd .= ' ' . $this->output;
-        return $cmd;
+        echo $cmd . "<br>";
+        return system($cmd);
+    }
+
+    private function audioOfSample($sample) {
+        foreach ($this->audios as $audio) {
+            if ($audio["id"] == $sample["audioId"])
+                return $audio;
+        }
+        throw new Exception("no audio found related to sample");
     }
 
     private function deflateTracks() {
