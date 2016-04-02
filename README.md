@@ -3,7 +3,7 @@ Projekt nr 2 na Techniki Internetowe
 
 ## Użyte technologie:
 - Back-end: PHP, SQLite
-- Front-end: HTML5, CSS3, JavaScript (Drag & Drop API)
+- Front-end: HTML5, CSS3, JavaScript (Drag & Drop API, Local Storage)
 
 ## Opis aplikacji
 Aplikacja służy to tworzenia muzyki na podstawie kawałków audio, które można przenosić na oś czasu.
