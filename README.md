@@ -1,6 +1,10 @@
 # WebJ
 Projekt nr 2 na Techniki Internetowe
 
+## Użyte technologie:
+- Back-end: PHP, SQLite
+- Front-end: HTML5, CSS3, JavaScript (Drag & Drop API)
+
 ## Opis aplikacji
 Aplikacja służy to tworzenia muzyki na podstawie kawałków audio, które można przenosić na oś czasu.
 Gdy aplikacja jest połączona z serwerem (stan połączenia na samym dole strony podczas tworzenia muzyki) non stop wysyła dane na temat utworu na serwer. Gdy aplikacja wykryje brak połączenia, to dane przechowywane są lokalnie dopóki połączenie nie zostanie przywrócone. Gdy użytkownik znajdzie się w takim stanie, to w momencie wyłączanie aplikacji zostanie poinformowany okienkiem dialogowym.
