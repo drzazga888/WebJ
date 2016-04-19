@@ -19,7 +19,7 @@ class SongController extends Controller {
         $model = new SongsModel();
         $audiosModel = new AudiosModel();
         $content = $model->getContent($params["id"]);
-        $audios = $audiosModel->getAllNames($_SESSION["user_id"]);
+        $audios = $audiosModel->getAllNamesWithCommon($_SESSION["user_id"]);
 
         //creating and seting
         $baseTop = new Template("base_top");
@@ -130,7 +130,7 @@ class SongController extends Controller {
         $songsModel = new SongsModel();
         $producer = new Producer(
             $songsModel->getContent($params["id"]),
-            $audiosModel->getAllFilenames($_SESSION["user_id"])
+            $audiosModel->getAllFilenamesWithCommon($_SESSION["user_id"])
         );
         $producer->make();
         $producer->download();

@@ -8,9 +8,10 @@ class Producer
     const EXTENSION = "wav";
     const OUTPUT = "mixed_audio.wav";
     const SILENCE_SAMPLE = "silence.wav";
+    const JOINED_SAMPLES = "joined.wav";
     const AUDIOS_FOLDER = "audios";
-    const TRIMMED_FOLDER = "samples_trimmed";
-    const PADDED_FOLDER = "samples_padded";
+    const PROCESSED_FOLDER = "processed";
+    const COMMON_FOLDER = "userdata/common/";
     const SILENCE = 'sox -n -r 44100 -c 2 ';
     const SILENCE_PARAMS = ' trim 0.0 ';
 
@@ -37,15 +38,14 @@ class Producer
         //echo '<pre>';
         //var_dump($this->samples);
         //echo '</pre><br>';
-        if (!file_exists($this->basePath . self::TRIMMED_FOLDER))
-            mkdir($this->basePath . self::TRIMMED_FOLDER);
-        if (!file_exists($this->basePath . self::PADDED_FOLDER))
-            mkdir($this->basePath . self::PADDED_FOLDER);
-        foreach ($this->samples as $sample) {
-            $this->trim($sample);
-            $this->pad($sample);
-        }
-        $this->merge();
+        if (!file_exists($this->basePath))
+            mkdir($this->basePath);
+        if (!file_exists($this->basePath . self::PROCESSED_FOLDER))
+            mkdir($this->basePath . self::PROCESSED_FOLDER);
+        foreach ($this->samples as $sample)
+            $this->processSingle($sample);
+        $this->processAll();
+        $this->clean();
     }
 
     public function download() {
@@ -62,38 +62,39 @@ class Producer
         readfile($this->basePath . self::OUTPUT);
     }
 
-    private function trim($sample) {
-        $cmd = self::PRODUCER_PATH .
-            ' ' . $this->basePath . self::AUDIOS_FOLDER . '/' . $this->audioOfSample($sample)["filename"] . '.' . self::EXTENSION .
-            ' ' . $this->basePath . self::TRIMMED_FOLDER . '/' . $sample["id"] . '.' . self::EXTENSION .
-            ' trim ' . $sample['offset'] . ' ' . $sample['duration'];
-        //echo '<h1>trim</h1>';
-        //echo $cmd . "<br><hr />";
-        return system($cmd);
+    private function getAudioPath($filename) {
+        $path = $this->basePath . self::AUDIOS_FOLDER . '/' . $filename . '.' . self::EXTENSION;
+        if (!file_exists($path))
+            $path = self::COMMON_FOLDER . self::AUDIOS_FOLDER . '/' . $filename . '.' . self::EXTENSION;
+        else if (!file_exists($path))
+            throw new FileNotFoundException();
+        return $path;
     }
 
-    private function pad($sample) {
+    private function processSingle($sample) {
         $cmd = self::PRODUCER_PATH .
-            ' ' . $this->basePath . self::TRIMMED_FOLDER . '/' . $sample["id"] . '.' . self::EXTENSION .
-            ' ' . $this->basePath . self::PADDED_FOLDER . '/' . $sample["id"] . '.' . self::EXTENSION .
-            ' pad ' . $sample['when'];
-        //echo '<h1>pad</h1>';
+            ' \'' . $this->getAudioPath($this->audioOfSample($sample)["filename"]) .
+            '\' \'' . $this->basePath . self::PROCESSED_FOLDER . '/' . $sample["id"] . '.' . self::EXTENSION .
+            '\' repeat trim ' . $sample['offset'] . ' ' . $sample['duration'] . ' pad ' . $sample['when'];
         //echo $cmd . "<br><hr />";
-        return system($cmd);
+        system($cmd);
     }
 
-    private function merge() {
-        $silenceCmd = self::SILENCE . $this->basePath . self::SILENCE_SAMPLE . self::SILENCE_PARAMS . $this->songLength;
-        //echo '<h1>silence</h1>';
+    private function processAll() {
+        $silenceCmd = self::SILENCE . $this->basePath . self::PROCESSED_FOLDER . '/' . self::SILENCE_SAMPLE . self::SILENCE_PARAMS . $this->songLength;
         //echo $silenceCmd . "<br><hr />";
         system($silenceCmd);
-        $cmd = self::PRODUCER_PATH . ' ' . self::MERGING_OPTION;
+        $joinCmd = self::PRODUCER_PATH . ' ' . self::MERGING_OPTION;
         foreach ($this->samples as $sample)
-            $cmd .= ' ' . $this->basePath . self::PADDED_FOLDER . '/' . $sample["id"] . '.' . self::EXTENSION;
-        $cmd .= ' ' . $this->basePath . self::SILENCE_SAMPLE . ' ' . $this->basePath . self::OUTPUT;
-        //echo '<h1>merge</h1>';
-        //echo $cmd . "<br><hr />";
-        return system($cmd);
+            $joinCmd .= ' \'' . $this->basePath . self::PROCESSED_FOLDER . '/' . $sample["id"] . '.' . self::EXTENSION . '\'';
+        $joinCmd .= ' \'' . $this->basePath . self::PROCESSED_FOLDER . '/' . self::SILENCE_SAMPLE . '\'' .
+            ' \'' . $this->basePath . self::PROCESSED_FOLDER . '/' . self::JOINED_SAMPLES. '\'';
+        //echo $joinCmd . "<br><hr />";
+        system($joinCmd);
+        $cmd = self::PRODUCER_PATH . ' ' .
+            $this->basePath . self::PROCESSED_FOLDER . '/' . self::JOINED_SAMPLES .
+            ' ' . $this->basePath . self::OUTPUT . ' trim 0 ' . $this->songLength;
+        system($cmd);
     }
 
     private function audioOfSample($sample) {
@@ -102,6 +103,21 @@ class Producer
                 return $audio;
         }
         throw new Exception("No audio found related to sample");
+    }
+
+    private function clean() {
+        if (is_dir($this->basePath . self::PROCESSED_FOLDER)) {
+            $objects = scandir($this->basePath . self::PROCESSED_FOLDER);
+            foreach ($objects as $object) {
+                if ($object != "." && $object != "..") {
+                    if (is_dir($this->basePath . self::PROCESSED_FOLDER . "/" . $object))
+                        rmdir($this->basePath . self::PROCESSED_FOLDER . "/" . $object);
+                    else
+                        unlink($this->basePath . self::PROCESSED_FOLDER . "/" . $object);
+                }
+            }
+            rmdir($this->basePath . self::PROCESSED_FOLDER);
+        }
     }
 
 }

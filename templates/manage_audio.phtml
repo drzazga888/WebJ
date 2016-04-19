@@ -1,0 +1,28 @@
+<section>
+    <h3>Dodawanie nowych plików</h3>
+    <p>Obsługiwane formaty: wav</p>
+    <p>Maksymalna wielkość pliku: <?= ini_get("upload_max_filesize") ?></p>
+    <form enctype="multipart/form-data" method="post" action="/?controller=audio&action=upload">
+        <fieldset>
+            <legend>Formularz dodawania pliku</legend>
+            <label>Wybierz plik: <input type="file" name="audio" required /></label>
+            <button type="submit">Prześlij plik</button>
+        </fieldset>
+    </form>
+</section>
+
+<section>
+    <h3>Obecne pliki</h3>
+    <?php if (count($audios) > 0): ?>
+        <ul class="deletable-list">
+            <?php foreach ($audios as $audio): ?>
+                <li>
+                    <a class="icon-cancel deleter" href="/?controller=audio&action=delete&id=<?= $audio["id"] ?>">Usuń</a>
+                    (ID#<?= $audio["id"] ?>), <?= $audio["name"] ?>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php else: ?>
+        <p>Brak utworów</p>
+    <?php endif; ?>
+</section>

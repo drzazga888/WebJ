@@ -9,8 +9,8 @@ class AudiosModel extends Model
         parent::__construct();
     }
 
-    public function getAllFilenames($userId) {
-        $names = $this->getAllNames($userId);
+    public function getAllFilenamesWithCommon($userId) {
+        $names = $this->getAllNamesWithCommon($userId);
         $filenames = array();
         foreach ($names as $name) {
             $filenames[] = array(
@@ -19,6 +19,13 @@ class AudiosModel extends Model
             );
         }
         return $filenames;
+    }
+
+    public function getAllNamesWithCommon($userId) {
+        return $this->select("audios", array(
+            "id",
+            "name"
+        ), "user_id IS NULL OR user_id=" . $userId);
     }
 
     public function getAllNames($userId) {
@@ -35,12 +42,23 @@ class AudiosModel extends Model
         return self::nameToFilename($result[0]["name"]);
     }
 
-    private static function nameToFilename($name) {
-        $exploded = explode(" ", $name);
-        for ($i = 0; $i < count($exploded); ++$i) {
-            $exploded[$i] = strtolower($exploded[$i]);
-        }
-        return implode("_", $exploded);
+    public function insertAudio($userId, $name) {
+        $this->insert("audios", [
+            "user_id" => $userId,
+            "name" => self::filenameToName($name)
+        ]);
+    }
+
+    public function deleteAudio($id, $userId) {
+        $this->delete('audios', 'id=' . $id . ' AND user_id=' . $userId);
+    }
+
+    public static function filenameToName($name) {
+        return implode(" ", explode("_", ucfirst($name)));
+    }
+
+    public static function nameToFilename($name) {
+        return implode("_", explode(" ", strtolower($name)));
     }
 
 }

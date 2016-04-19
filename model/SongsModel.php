@@ -39,6 +39,7 @@ class SongsModel extends Model {
      * Metoda pobiera utwór w formacie JSON z bazy danych
      * @param $id - nr ID utworu
      * @return mixed - zakodowany utwór (obiekt typu Mixer, okrojony, w formacie JSON)
+     * @throws RowNotFoundException
      */
     public function getContent($id) {
         $result = $this->select("songs", array(
@@ -56,9 +57,12 @@ class SongsModel extends Model {
      * Metoda aktualizuje utwór
      * @param $id - nr ID utwotu
      * @param $song - zakodowany utwór (obiekt typu Mixer, okrojony, w formacie JSON)
+     * @param bool $in_json - czy format zmiennej $song jest typu JSON
+     * @return string|void
      */
-    public function update($id, $song) {
-        $song = json_decode($song, true);
+    public function update($id, $song, $in_json = true) {
+        if ($in_json)
+            $song = json_decode($song, true);
         parent::update("songs", array(
             "name" => $song["name"],
             "tracks" => json_encode($song["tracks"]),
