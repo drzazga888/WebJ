@@ -36,8 +36,8 @@ abstract class Model {
         $queryValuePart = substr($queryValuePart, 0, -2);
         $query = 'insert into ' . $table . ' (' . $queryNamePart . ') values (' . $queryValuePart . ')';
         $stmt = $this->pdo->prepare($query);
-        foreach ($params as $name => $value)
-            $stmt->bindParam(':' . $name, $params[$name], PDO::PARAM_STR);
+        foreach ($params as $name => &$value)
+            $stmt->bindParam(':' . $name, $value, PDO::PARAM_STR);
         $stmt->execute();
         $stmt->closeCursor();
         return $this->pdo->lastInsertId();

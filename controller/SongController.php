@@ -133,7 +133,7 @@ class SongController extends Controller {
             $audiosModel->getAllFilenames($_SESSION["user_id"])
         );
         $producer->make();
-        //$producer->download();
+        $producer->download();
     }
 
 }
