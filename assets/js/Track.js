@@ -106,6 +106,15 @@ Track.prototype.removeSample = function(sample) {
 };
 
 /**
+ * Metoda zwraca tracka na podstawie DOM
+ * @param dom - obiekt typu DOM - Document Object Model
+ * @returns {*} - obiekt typu Track
+ */
+Track.getTrack = function(dom) {
+    return Mixer.tracks[$(dom).closest(".track").data("id")];
+};
+
+/**
  * Obiekt zbiorczy na funkcje obsługujące zdarzenia
  * @type {{dragenter: Function, dragover: Function, dragleave: Function, drop: Function, changeName: Function}}
  */
@@ -118,7 +127,7 @@ Track.events = {
     dragenter: function(event) {
         $(event.target).addClass("emphase");
         var track = Track.getTrack(event.target);
-        Mixer.draggedSample.dom.appendTo(track.timelineDom);
+        Mixer.draggedSample.ref.dom.removeClass("ghost").appendTo(track.timelineDom);
     },
 
     /**
@@ -128,7 +137,7 @@ Track.events = {
     dragover: function(event) {
         event.preventDefault();
         var elemLayerX = event.dataTransfer.getData("text/plain");
-        Mixer.draggedSample.setWhen((event.layerX - elemLayerX) / Mixer.draggedSample.pixelsPerSecond);
+        Mixer.draggedSample.ref.setWhen((event.layerX - elemLayerX) / Mixer.draggedSample.ref.pixelsPerSecond);
     },
 
     /**
@@ -137,8 +146,16 @@ Track.events = {
      */
     dragleave: function(event) {
         $(event.target).removeClass("emphase");
-        Mixer.draggedSample.dom.remove();
-        Mixer.draggedSample.dom.data("id", Mixer.draggedSample.id);
+        if (Mixer.draggedSample.origin !== undefined) {
+            Mixer.draggedSample.ref.dom.addClass("ghost").appendTo(
+                Mixer.draggedSample.origin.track.timelineDom
+            );
+            Mixer.draggedSample.ref.setWhen(Mixer.draggedSample.origin.when);
+        }
+        else {
+            Mixer.draggedSample.ref.dom.remove();
+            //Mixer.draggedSample.dom.data("id", Mixer.draggedSample.id);
+        }
     },
 
     /**
@@ -149,10 +166,10 @@ Track.events = {
         event.preventDefault();
         $(event.target).removeClass("emphase");
         var track = Track.getTrack(event.target);
-        if (Mixer.draggedSample.id === undefined)
-            Mixer.draggedSample.assignId();
-        track.addSample(Mixer.draggedSample);
-        Sample.collection[Mixer.draggedSample.id] = Mixer.draggedSample;
+        if (Mixer.draggedSample.ref.id === undefined)
+            Mixer.draggedSample.ref.assignId();
+        track.addSample(Mixer.draggedSample.ref);
+        Sample.collection[Mixer.draggedSample.ref.id] = Mixer.draggedSample.ref;
         Mixer.draggedSample = null;
     },
 
@@ -166,13 +183,4 @@ Track.events = {
         Storage.actualize();
     }
 
-};
-
-/**
- * Metoda zwraca tracka na podstawie DOM
- * @param dom - obiekt typu DOM - Document Object Model
- * @returns {*} - obiekt typu Track
- */
-Track.getTrack = function(dom) {
-    return Mixer.tracks[$(dom).closest(".track").data("id")];
 };

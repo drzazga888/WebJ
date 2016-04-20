@@ -69,6 +69,14 @@ h3 {
     text-transform: uppercase;
 }
 
+h3 strong {
+    font-size: 4em;
+    font-weight: normal;
+    text-transform: none;
+    float: left;
+    margin: -20px 20px 10px 0;
+}
+
 h4 {
     font-size: 1em;
     text-transform: uppercase;
@@ -133,6 +141,13 @@ img {
 }
 
 /* klasy */
+
+.important-section {
+    background: url(../img/bkg.png) no-repeat center;
+    background-size: cover;
+    padding: 60px 30px;
+    text-shadow: rgba(0, 0, 0, 0.5) 2px 2px 8px;
+}
 
 .stick-to-top-right-corner {
     position: absolute;
@@ -271,6 +286,10 @@ img {
     margin-right: 10px;
 }
 
+.hidden {
+    display: none;
+}
+
 /* mixer */
 
 #tracks {
@@ -355,10 +374,18 @@ img {
     height: 100%;
     border: dashed 1px #C7E3E8;
     overflow: hidden;
-    background: rgba(56, 101, 125, 0.7);
+    background: rgba(41, 150, 204, 0.3);
     transition: box-shadow 0.2s;
     font-size: 0.8em;
     cursor: pointer;
+}
+
+#tracks .sample.ghost {
+    background: repeating-linear-gradient(-45deg,
+        rgba(80%, 80%, 20%, 0.1) 0px,
+        rgba(80%, 80%, 20%, 0.1) 9px,
+        rgba(50%, 50%, 50%, 0.1) 10px,
+        rgba(50%, 50%, 50%, 0.1) 19px);
 }
 
 #tracks .sample p {
@@ -373,6 +400,15 @@ img {
     background: none;
     color: #FFCE00;
     width: 50px;
+}
+
+#tracks .sample .deleter {
+    background: rgba(100%, 0%, 0%, 0.2);
+    border: solid 2px #f00;
+    padding: 4px;
+    position: absolute;
+    top: 3px;
+    right: 3px;
 }
 
 #tracks .sample:hover {

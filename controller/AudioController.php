@@ -71,12 +71,13 @@ class AudioController extends Controller {
 
         if (file_exists($uploadFilePrefix . $uploadFile) || file_exists('userdata/common' . $uploadFile))
             self::redirect("Plik o podanej nazwie już istnieje", "danger", "audio", "manage");
-        $model = new AudiosModel();
-        $model->insertAudio($_SESSION["user_id"], AudiosModel::filenameToName($uploadFileBase));
-        if (move_uploaded_file($_FILES['audio']['tmp_name'], $uploadFilePrefix . $uploadFile))
+        if (move_uploaded_file($_FILES['audio']['tmp_name'], $uploadFilePrefix . $uploadFile)) {
+            $model = new AudiosModel();
+            $model->insertAudio($_SESSION["user_id"], AudiosModel::filenameToName($uploadFileBase));
             self::redirect("Plik został dodany ", "success", "audio", "manage");
+        }
         else
-            self::redirect("Wystąpił błąd podczas dodawania pliku", "danger", "audio", "manage");
+            self::redirect("Wystąpił błąd podczas dodawania pliku " . $uploadFilePrefix . $uploadFile, "danger", "audio", "manage");
     }
 
     public function delete($params) {

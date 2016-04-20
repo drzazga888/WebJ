@@ -15,6 +15,7 @@ function Sample(when, offset, duration, audio, pixelsPerSecond, id) {
         '<p>' + this.audio.name + '</p>' +
         '<p>start [s]: <em><input type="number" step="0.01" min="0" max="999.99" class="offset" /></em></p>' +
         '<p>dlugość [s]: <em><input type="number" step="0.01" min="0" max="999.99" class="duration" /></em></p>' +
+        '<p class="deleter icon-cancel"></p>' +
         '</div>');
     if (id !== undefined) {
         this.id = id;
@@ -27,6 +28,7 @@ function Sample(when, offset, duration, audio, pixelsPerSecond, id) {
     this.setDuration(duration);
     this.dom[0].addEventListener("dragstart", Sample.events.dragstart, true);
     this.dom[0].addEventListener("dragend", Sample.events.dragend, true);
+    this.dom.find(".deleter")[0].addEventListener("click", Sample.events.delete, true);
     this.dom.find(".duration")[0].addEventListener("change", Sample.events.changeDuration, true);
     this.dom.find(".offset")[0].addEventListener("change", Sample.events.changeOffset, true);
 }
@@ -169,13 +171,21 @@ Sample.events = {
      * @param event - obiekt typu Event - zawiera informacje do obsługi żądanie, generowany automatycznie
      */
     dragstart: function(event) {
-        Mixer.draggedSample = Sample.getSample(event.target);
-        Sample.collection[Mixer.draggedSample.id] = undefined;
+        var ref = Sample.getSample(event.target);
+        Mixer.draggedSample = {
+            ref: ref,
+            origin: {
+                when: ref.when,
+                track: Track.getTrack(ref.dom)
+            }
+        };
+        delete Sample.collection[Mixer.draggedSample.ref.id];
         var track = Track.getTrack($(event.target).closest(".track"));
-        track.removeSample(Mixer.draggedSample);
+        track.removeSample(Mixer.draggedSample.ref);
         event.dataTransfer.setData("text/plain", event.layerX);
         event.dataTransfer.effectAllowed = "move";
         event.dataTransfer.dropEffect = "move";
+        event.dataTransfer.setDragImage(Sample.dragImg[0], 0, -12);
         Mixer.trackTimelinesDom.addClass("dragging");
     },
 
@@ -185,8 +195,15 @@ Sample.events = {
      */
     dragend: function(event) {
         Mixer.trackTimelinesDom.removeClass("dragging");
-        Mixer.draggedSample = null;
-        Storage.actualize();
+        if (Mixer.draggedSample !== null) {
+            var sample = Mixer.draggedSample.ref;
+            Sample.collection[sample.id] = sample;
+            Mixer.draggedSample.origin.track.addSample(sample);
+            sample.dom.removeClass('ghost');
+            Mixer.draggedSample = null;
+        }
+        else
+            Storage.actualize();
     },
 
     /**
@@ -207,8 +224,22 @@ Sample.events = {
         var sample = Sample.getSample(event.target);
         sample.setOffset(event.target.value);
         Storage.actualize();
+    },
+
+    /**
+     * Callback wywołany, gdy naciśniemy przycisk usuwający sampla
+     * @param event - obiekt zdarzenia
+     */
+    delete: function(event) {
+        var sample = Sample.getSample(event.target);
+        var track = Track.getTrack(event.target);
+        sample.dom.remove();
+        track.removeSample(sample);
+        delete Sample.collection[sample.id];
+        Storage.actualize();
     }
 
 };
 
-Sample.collection = [];
+Sample.collection = {};
+Sample.dragImg = $('<img />').attr('src', '/assets/img/sample_drag.png');

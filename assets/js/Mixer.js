@@ -65,13 +65,17 @@ Mixer.stringify = function() {
     var obj = {
         duration: this.timelineDuration,
         name: this.name,
-        tracks: []
+        tracks: {}
     };
-    var i;
-    for (i = 0; i < this.tracks.length; ++i) {
+    //var i;
+    for (var trackId in this.tracks) {
+        if (this.tracks.hasOwnProperty(trackId))
+            obj.tracks[trackId] = this.tracks[trackId].shorten();
+    }
+    /*for (i = 0; i < this.tracks.length; ++i) {
         if (this.tracks[i])
             obj.tracks.push(this.tracks[i].shorten());
-    }
+    }*/
     return JSON.stringify(obj);
 };
 
@@ -83,11 +87,19 @@ Mixer.stringify = function() {
 Mixer.parse = function(stringified, jsonAudios) {
     var obj = JSON.parse(stringified);
     var objAudios = JSON.parse(jsonAudios);
-    var i;
-    for (i = 0; i < objAudios.length; ++i)
+    //var i;
+    for (var audio in objAudios) {
+        if (objAudios.hasOwnProperty(audio))
+            Mixer.addAudio(Audio.enlarge(objAudios[audio]));
+    }
+    for (var track in obj.tracks) {
+        if (obj.tracks.hasOwnProperty(track))
+            Mixer.addTrack(Track.enlarge(obj.tracks[track]));
+    }
+    /*for (i = 0; i < objAudios.length; ++i)
         Mixer.addAudio(Audio.enlarge(objAudios[i]));
     for (i = 0; i < obj.tracks.length; ++i)
-        Mixer.addTrack(Track.enlarge(obj.tracks[i]));
+        Mixer.addTrack(Track.enlarge(obj.tracks[i]));*/
     Mixer.setTimelineDuration(obj.duration);
     Mixer.timelineDurationChanger.val(obj.duration);
     Mixer.setName(obj.name);
@@ -128,7 +140,7 @@ Mixer.removeTrack = function(id) {
             }
         }
     }
-    this.tracks[id] = undefined;
+    delete this.tracks[id];
     Storage.actualize();
 };
 
@@ -175,10 +187,14 @@ Mixer.setPixelsPerSecond = function(pixelsPerSecond) {
  */
 Mixer.play = function() {
     Mixer.isPlaying = true;
-    for (var i = 0; i < Sample.collection.length; ++i) {
+    for (var sampleId in Sample.collection) {
+        if (Sample.collection.hasOwnProperty(sampleId))
+            Sample.collection[sampleId].play(0);
+    }
+    /*for (var i = 0; i < Sample.collection.length; ++i) {
         if (Sample.collection[i] !== undefined)
             Sample.collection[i].play(0);
-    }
+    }*/
     Mixer.pipe.css("left", 0);
     Mixer.pipe.show();
     Mixer.playPauseButton.removeClass("icon-play").addClass("icon-pause");
@@ -199,9 +215,13 @@ Mixer.play = function() {
 Mixer.pause = function() {
     window.clearTimeout(Mixer.stopTimeout);
     window.clearInterval(Mixer.pipeInterval);
-    for (var i = 0; i < Sample.collection.length; ++i) {
+    /*for (var i = 0; i < Sample.collection.length; ++i) {
         if (Sample.collection[i] !== undefined)
             Sample.collection[i].pause();
+    }*/
+    for (var sampleId in Sample.collection) {
+        if (Sample.collection.hasOwnProperty(sampleId))
+            Sample.collection[sampleId].pause(0);
     }
     Mixer.pipe.hide();
     Mixer.playPauseButton.removeClass("icon-pause").addClass("icon-play");
@@ -235,8 +255,8 @@ Mixer.setName = function(name) {
     Storage.actualize();
 };
 
-Mixer.tracks = [];
-Mixer.audios = [];
+Mixer.tracks = {};
+Mixer.audios = {};
 Mixer.pixelsPerSecond = 0;
 Mixer.timelineDuration = 0;
 Mixer.draggedSample = null;

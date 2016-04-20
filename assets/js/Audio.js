@@ -95,7 +95,10 @@ Audio.events = {
         var audio = Audio.getAudio(event.target);
         if (!audio.buffer)
             return false;
-        Mixer.draggedSample = new Sample(0, 0, audio.buffer.duration, audio, Mixer.pixelsPerSecond);
+        var ref = new Sample(0, 0, audio.buffer.duration, audio, Mixer.pixelsPerSecond);
+        Mixer.draggedSample = {
+            ref: ref
+        };
         event.dataTransfer.setData("text/plain", (audio.buffer.duration * Mixer.pixelsPerSecond * 0.5));
         event.dataTransfer.effectAllowed = "move";
         event.dataTransfer.dropEffect = "move";
@@ -126,5 +129,5 @@ Audio.events = {
 
 };
 
-Audio.collection = [];
+Audio.collection = {};
 Audio.ctx = new AudioContext();
