@@ -10,14 +10,12 @@
             <?php if (!isset($_SESSION["user_id"])): ?>
                 <a class="icon-user" href="javascript:void(0);">Niezalogowany</a>
                 <div class="dropdown-body">
-                    <p>Musisz się zalogować, by korzystać z aplikacji!</p>
                     <p><a href="/?controller=auth&action=register">Rejestracja</a></p>
                     <p><a href="/?controller=auth&action=login">Logowanie</a></p>
                 </div>
             <?php else: ?>
-                <a class="icon-user" href="javascript:void(0);">Zalogowany</a>
+                <a class="icon-user" href="javascript:void(0);"><?= $_SESSION["user_email"] ?></a>
                 <div class="dropdown-body">
-                    <p>Zalogowano jako <em><?= $_SESSION["user_email"] ?></em></p>
                     <p><a href="/?controller=auth&action=logout">Wylogowanie</a></p>
                 </div>
             <?php endif; ?>
