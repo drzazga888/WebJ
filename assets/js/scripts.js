@@ -8,4 +8,10 @@ $(document).ready(function() {
         $(this).find(".dropdown-body").stop().slideToggle(200);
     });
 
+    window.setTimeout(function(){
+        $('.message').fadeOut(400).delay(400).queue(function(){
+            $(this).remove();
+        });
+    }, 4000);
+
 });
