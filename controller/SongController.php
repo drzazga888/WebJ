@@ -128,12 +128,18 @@ class SongController extends Controller {
 
         $audiosModel = new AudiosModel();
         $songsModel = new SongsModel();
-        $producer = new Producer(
-            $songsModel->getContent($params["id"]),
-            $audiosModel->getAllFilenamesWithCommon($_SESSION["user_id"])
-        );
-        $producer->make();
-        $producer->download();
+        try {
+            $producer = new Producer(
+                $songsModel->getContent($params["id"]),
+                $audiosModel->getAllFilenamesWithCommon($_SESSION["user_id"])
+            );
+            $producer->make();
+            $producer->download();
+        } catch (EmptySongException $e) {
+            self::redirect("Utwór nie zawiera żadnych kawałków muzycznych", "danger", "song", "mix", [
+                'id' => $params['id']
+            ]);
+        }
     }
 
 }

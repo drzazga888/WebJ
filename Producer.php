@@ -1,5 +1,7 @@
 <?php
 
+include_once "exceptions/EmptySongException.php";
+
 class Producer
 {
 
@@ -22,16 +24,16 @@ class Producer
     private $songName;
 
     public function __construct(array $pattern, array $audios) {
-        if (empty($audios))
-            throw new Exception("Song is empty");
-        $this->audios = $audios;
-        $this->basePath = str_replace('{id}', $_SESSION["user_id"], $this->basePath);
-        $this->songLength = $pattern["duration"];
-        $this->songName = $pattern["name"];
         foreach ($pattern["tracks"] as $track) {
             foreach ($track["samples"] as $sample)
                 $this->samples[] = $sample;
         }
+        if (empty($this->samples))
+            throw new EmptySongException();
+        $this->audios = $audios;
+        $this->basePath = str_replace('{id}', $_SESSION["user_id"], $this->basePath);
+        $this->songLength = $pattern["duration"];
+        $this->songName = $pattern["name"];
     }
 
     public function make() {
@@ -102,7 +104,7 @@ class Producer
             if ($audio["id"] == $sample["audioId"])
                 return $audio;
         }
-        throw new Exception("No audio found related to sample");
+        throw new RuntimeException("No audio found related to sample");
     }
 
     private function clean() {
