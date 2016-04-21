@@ -169,15 +169,15 @@ Mixer.setPixelsPerSecond = function(pixelsPerSecond) {
             to right,\
             transparent,\
             transparent " + ((incrementValue * pixelsPerSecond) - 1) + "px,\
-            rgba(20%, 50%, 80%, 0.7) " + (incrementValue * pixelsPerSecond) + "px\
+            rgb(30%, 65%, 80%) " + (incrementValue * pixelsPerSecond) + "px\
         )"
     });
     Mixer.trackTimelinesDom.css( {
         width: (Mixer.timelineDuration * Mixer.pixelsPerSecond) + "px"
     });
-    for (var i = 0; i < Sample.collection.length; ++i) {
-        if (Sample.collection[i] !== undefined)
-            Sample.collection[i].changeScale(pixelsPerSecond);
+    for (var sampleId in Sample.collection) {
+        if (Sample.collection.hasOwnProperty(sampleId))
+            Sample.collection[sampleId].changeScale(pixelsPerSecond);
     }
     Mixer.actualizeTimes();
 };
